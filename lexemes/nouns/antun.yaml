@@ -1,0 +1,21 @@
+schema_version: '1.0'
+entry_kind: lexeme
+id: antun
+key: antun
+lemma: antun
+display_lemma: Antun
+major_category: noun
+subtype: personal-name
+glosses:
+  - Antun
+  - Anthony
+  - Antony
+notes: ''
+tags:
+  - class-5
+status: active
+stem_variants:
+  - label: base
+    form: Antun
+manual_overrides: {}
+template_id: noun-class-5

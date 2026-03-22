@@ -1,0 +1,24 @@
+schema_version: '1.0'
+entry_kind: lexeme
+id: janek
+key: janek
+lemma: janek
+display_lemma: Janek
+major_category: noun
+subtype: person-name
+glosses:
+  - Janek
+  - John
+notes: ''
+tags:
+  - personal-name
+status: active
+stem_variants:
+  - label: base
+    form: Janek
+  - label: reduced-hard
+    form: Jank
+  - label: reduced-soft
+    form: Janc
+manual_overrides: {}
+template_id: noun-class-3a

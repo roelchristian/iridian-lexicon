@@ -1,0 +1,22 @@
+schema_version: "1.0"
+entry_kind: lexeme
+id: ka-post
+key: ka.post
+lemma: ka
+display_lemma: ka
+major_category: postposition
+subtype: locative
+glosses:
+  - at
+  - in
+  - on (locative)
+notes: >
+  Locative postposition. Follows its complement NP.
+  Invariant — does not inflect for case or number of its complement.
+status: active
+tags: [postposition, locative, function-word]
+inflection_profile: invariant
+stem_variants: []
+manual_overrides: {}
+usage_examples: []
+attested_in: []
