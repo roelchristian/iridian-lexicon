@@ -15,7 +15,11 @@ function latexEscape(s: string): string {
     .replace(/\^/g, '\\textasciicircum{}');
 }
 
-export function buildAppendixLatex(exportData: LexiconExport): string {
+export function buildAppendixLatex(
+  exportData: LexiconExport,
+  opts: { standalone?: boolean } = {}
+): string {
+  const { standalone = false } = opts;
   const lines: string[] = [];
 
   lines.push(
@@ -25,6 +29,18 @@ export function buildAppendixLatex(exportData: LexiconExport): string {
     '% DO NOT EDIT BY HAND.',
     '% ============================================================',
     '',
+  );
+
+  if (standalone) {
+    lines.push(
+      '\\documentclass[12pt]{book}',
+      '\\usepackage{fontspec}',
+      '\\begin{document}',
+      '',
+    );
+  }
+
+  lines.push(
     '\\appendix',
     '',
     '\\chapter{Lexical Appendix}',
@@ -133,6 +149,9 @@ export function buildAppendixLatex(exportData: LexiconExport): string {
     lines.push('  \\hline', '\\end{tabular}', '');
   }
 
+  if (standalone) {
+    lines.push('\\end{document}');
+  }
   lines.push('% End of appendix-lexicon.tex');
   return lines.join('\n') + '\n';
 }

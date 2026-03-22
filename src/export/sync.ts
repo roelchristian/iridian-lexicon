@@ -60,7 +60,7 @@ export async function syncGrammarArtifacts(
   filesWritten.push(path.relative(repoRoot, latexPath));
 
   // 3. Appendix LaTeX
-  const appendix = buildAppendixLatex(exportData);
+  const appendix = buildAppendixLatex(exportData, { standalone: true });
   const appendixPath = path.join(tempDir, 'appendix-lexicon.tex');
   fs.writeFileSync(appendixPath, appendix, 'utf-8');
   filesWritten.push(path.relative(repoRoot, appendixPath));
