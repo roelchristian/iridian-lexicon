@@ -27,6 +27,13 @@ export interface ParadigmCell {
   features: FeatureValue[];
 
   /**
+   * A prefix string prepended before the stem variant.  Morphological
+   * notation hyphens are stripped at generation time (e.g. "zá-" → "zá").
+   * Omit or leave empty for no prefix.
+   */
+  prefix?: string;
+
+  /**
    * The suffix/affix string appended to the chosen stem variant
    * to produce the surface form.  May be empty string for zero morphology.
    */
