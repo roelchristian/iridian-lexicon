@@ -78,6 +78,7 @@ const LexemeMajorCategorySchema = z.enum([
   'verb',
   'modifier',
   'function-word',
+  'postposition',
 ]);
 
 const MajorCategorySchema = z.enum([
@@ -85,6 +86,7 @@ const MajorCategorySchema = z.enum([
   'verb',
   'modifier',
   'function-word',
+  'postposition',
   'prefix',
   'suffix',
   'infix',
@@ -115,15 +117,15 @@ export const LexemeEntrySchema = z
     major_category: LexemeMajorCategorySchema,
     subtype: z.string().min(1),
     glosses: z.array(z.string().min(1)).min(1),
-    notes: z.string(),
-    tags: z.array(z.string()),
+    notes: z.string().optional().default(''),
+    tags: z.array(z.string()).optional().default([]),
     status: EntryStatusSchema,
     template_id: z.string().optional(),
     inflection_profile: z.string().optional(),
-    stem_variants: z.array(StemVariantSchema),
-    manual_overrides: z.record(z.string(), z.string()),
-    usage_examples: z.array(UsageExampleSchema),
-    attested_in: z.array(z.string()),
+    stem_variants: z.array(StemVariantSchema).optional().default([]),
+    manual_overrides: z.record(z.string(), z.string()).optional().default({}),
+    usage_examples: z.array(UsageExampleSchema).optional().default([]),
+    attested_in: z.array(z.string()).optional().default([]),
   })
   .refine(
     (d) => d.template_id !== undefined || d.inflection_profile !== undefined,
@@ -156,14 +158,14 @@ export const MorphemeEntrySchema = z.object({
   major_category: MajorCategorySchema,
   subtype: z.string().min(1),
   glosses: z.array(z.string().min(1)).min(1),
-  notes: z.string(),
-  tags: z.array(z.string()),
+  notes: z.string().optional().default(''),
+  tags: z.array(z.string()).optional().default([]),
   status: EntryStatusSchema,
   display_form: z.string().min(1),
   gloss_abbr: z.string().min(1),
   slot: z.string().min(1),
   category: z.string().min(1),
-  allomorph_rules: z.array(AllomorphRuleSchema),
+  allomorph_rules: z.array(AllomorphRuleSchema).optional().default([]),
   override_hook: z.string().optional(),
 });
 
@@ -176,6 +178,7 @@ export type ValidatedMorphemeEntry = z.infer<typeof MorphemeEntrySchema>;
 export const ParadigmCellSchema = z.object({
   slot: z.string().min(1),
   features: z.array(FeatureValueSchema),
+  prefix: z.string().optional(), // prefix prepended before the stem; notation hyphens stripped at generation
   suffix: z.string(), // empty string is valid (zero morphology)
   stem_variant: z.string().optional(),
   morpheme_key: z.string().optional(),
@@ -187,13 +190,13 @@ export const InflectionRuleSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
   key: z.string().regex(/^[a-zA-Z0-9_.:-]+$/),
   name: z.string().min(1),
-  description: z.string(),
+  description: z.string().optional().default(''),
   category: z.string().min(1),
-  feature_axes: z.array(z.array(z.string().min(1))),
+  feature_axes: z.array(z.array(z.string().min(1))).optional().default([]),
   cells: z.array(ParadigmCellSchema).min(1),
-  inherits: z.array(z.string()).optional(),
-  tags: z.array(z.string()),
-  notes: z.string(),
+  inherits: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+  notes: z.string().optional().default(''),
 });
 
 export type ValidatedInflectionRule = z.infer<typeof InflectionRuleSchema>;
@@ -222,12 +225,12 @@ export const MorphotacticRuleSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
   key: z.string().regex(/^[a-zA-Z0-9_.:-]+$/),
   name: z.string().min(1),
-  description: z.string(),
+  description: z.string().optional().default(''),
   word_class: z.string().min(1),
   slots: z.array(MorphotacticSlotSchema).min(1),
-  alternations: z.array(AlternationRuleSchema),
-  tags: z.array(z.string()),
-  notes: z.string(),
+  alternations: z.array(AlternationRuleSchema).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+  notes: z.string().optional().default(''),
 });
 
 export type ValidatedMorphotacticRule = z.infer<typeof MorphotacticRuleSchema>;
@@ -250,12 +253,12 @@ export const SyntaxRuleSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
   key: z.string().regex(/^[a-zA-Z0-9_.:-]+$/),
   name: z.string().min(1),
-  description: z.string(),
+  description: z.string().optional().default(''),
   word_order: z.string().min(1),
-  constraints: z.array(SyntaxSlotConstraintSchema),
-  strict_order: z.boolean(),
-  tags: z.array(z.string()),
-  notes: z.string(),
+  constraints: z.array(SyntaxSlotConstraintSchema).optional().default([]),
+  strict_order: z.boolean().optional().default(false),
+  tags: z.array(z.string()).optional().default([]),
+  notes: z.string().optional().default(''),
 });
 
 export type ValidatedSyntaxRule = z.infer<typeof SyntaxRuleSchema>;
