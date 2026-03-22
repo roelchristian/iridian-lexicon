@@ -1,15 +1,12 @@
 /**
- * Common query functions for the SQLite projection.
- *
- * All reads go through these functions so callers don't need to know
- * the DB schema layout.  All JSON columns are parsed before returning.
+ * Common query functions for the SQLite projection (node:sqlite).
  */
 
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import type { GeneratedForm } from '../types/index.js';
 
 // ---------------------------------------------------------------------------
-// Row types (raw DB shapes)
+// Row types
 // ---------------------------------------------------------------------------
 
 interface EntryRow {
@@ -17,7 +14,7 @@ interface EntryRow {
   key: string;
   lemma: string;
   display_lemma: string;
-  entry_kind: 'lexeme' | 'morpheme';
+  entry_kind: string;
   major_category: string;
   subtype: string;
   glosses_json: string;
@@ -67,18 +64,10 @@ function parseEntry(row: EntryRow) {
     ...row,
     glosses: JSON.parse(row.glosses_json) as string[],
     tags: JSON.parse(row.tags_json) as string[],
-    stem_variants: row.stem_variants_json
-      ? JSON.parse(row.stem_variants_json)
-      : undefined,
-    manual_overrides: row.manual_overrides_json
-      ? JSON.parse(row.manual_overrides_json)
-      : undefined,
-    attested_in: row.attested_in_json
-      ? JSON.parse(row.attested_in_json)
-      : undefined,
-    allomorph_rules: row.allomorph_rules_json
-      ? JSON.parse(row.allomorph_rules_json)
-      : undefined,
+    stem_variants: row.stem_variants_json ? JSON.parse(row.stem_variants_json) : undefined,
+    manual_overrides: row.manual_overrides_json ? JSON.parse(row.manual_overrides_json) : undefined,
+    attested_in: row.attested_in_json ? JSON.parse(row.attested_in_json) : undefined,
+    allomorph_rules: row.allomorph_rules_json ? JSON.parse(row.allomorph_rules_json) : undefined,
   };
 }
 
@@ -94,140 +83,105 @@ function parseForm(row: FormRow): GeneratedForm {
 }
 
 // ---------------------------------------------------------------------------
-// Entry queries
+// Entries
 // ---------------------------------------------------------------------------
 
-export function getAllEntries(db: Database.Database) {
-  const rows = db.prepare('SELECT * FROM entries ORDER BY key').all() as EntryRow[];
-  return rows.map(parseEntry);
+export function getAllEntries(db: DatabaseSync) {
+  return (db.prepare('SELECT * FROM entries ORDER BY key').all() as EntryRow[]).map(parseEntry);
 }
 
-export function getLexemes(db: Database.Database) {
-  const rows = db
-    .prepare("SELECT * FROM entries WHERE entry_kind = 'lexeme' ORDER BY key")
-    .all() as EntryRow[];
-  return rows.map(parseEntry);
+export function getLexemes(db: DatabaseSync) {
+  return (db.prepare("SELECT * FROM entries WHERE entry_kind = 'lexeme' ORDER BY key").all() as EntryRow[]).map(parseEntry);
 }
 
-export function getMorphemes(db: Database.Database) {
-  const rows = db
-    .prepare("SELECT * FROM entries WHERE entry_kind = 'morpheme' ORDER BY key")
-    .all() as EntryRow[];
-  return rows.map(parseEntry);
+export function getMorphemes(db: DatabaseSync) {
+  return (db.prepare("SELECT * FROM entries WHERE entry_kind = 'morpheme' ORDER BY key").all() as EntryRow[]).map(parseEntry);
 }
 
-export function getEntryByKey(db: Database.Database, key: string) {
-  const row = db
-    .prepare('SELECT * FROM entries WHERE key = ?')
-    .get(key) as EntryRow | undefined;
+export function getEntryByKey(db: DatabaseSync, key: string) {
+  const row = db.prepare('SELECT * FROM entries WHERE key = $key').get({ key }) as EntryRow | undefined;
   return row ? parseEntry(row) : null;
 }
 
-export function getEntryById(db: Database.Database, id: string) {
-  const row = db
-    .prepare('SELECT * FROM entries WHERE id = ?')
-    .get(id) as EntryRow | undefined;
+export function getEntryById(db: DatabaseSync, id: string) {
+  const row = db.prepare('SELECT * FROM entries WHERE id = $id').get({ id }) as EntryRow | undefined;
   return row ? parseEntry(row) : null;
 }
 
-/** Full-text search across entries. */
-export function searchEntries(db: Database.Database, query: string) {
-  const rows = db
-    .prepare(`
+export function searchEntries(db: DatabaseSync, query: string) {
+  try {
+    const rows = db.prepare(`
       SELECT e.* FROM entries e
       JOIN entries_fts fts ON e.rowid = fts.rowid
-      WHERE entries_fts MATCH ?
+      WHERE entries_fts MATCH $query
       ORDER BY rank
-    `)
-    .all(query) as EntryRow[];
-  return rows.map(parseEntry);
+    `).all({ query }) as EntryRow[];
+    return rows.map(parseEntry);
+  } catch {
+    // FTS5 unavailable — fall back to LIKE search
+    const likeQ = `%${query}%`;
+    const rows = db.prepare(`
+      SELECT * FROM entries
+      WHERE key LIKE $q OR lemma LIKE $q OR notes LIKE $q OR glosses_json LIKE $q
+      ORDER BY key
+    `).all({ q: likeQ }) as EntryRow[];
+    return rows.map(parseEntry);
+  }
 }
 
-export function getEntriesByCategory(
-  db: Database.Database,
-  category: string
-) {
-  const rows = db
-    .prepare('SELECT * FROM entries WHERE major_category = ? ORDER BY key')
-    .all(category) as EntryRow[];
-  return rows.map(parseEntry);
+export function getEntriesByCategory(db: DatabaseSync, category: string) {
+  return (db.prepare('SELECT * FROM entries WHERE major_category = $category ORDER BY key')
+    .all({ category }) as EntryRow[]).map(parseEntry);
 }
 
-export function getEntriesByStatus(
-  db: Database.Database,
-  status: 'active' | 'draft' | 'deprecated'
-) {
-  const rows = db
-    .prepare('SELECT * FROM entries WHERE status = ? ORDER BY key')
-    .all(status) as EntryRow[];
-  return rows.map(parseEntry);
+export function getEntriesByStatus(db: DatabaseSync, status: string) {
+  return (db.prepare('SELECT * FROM entries WHERE status = $status ORDER BY key')
+    .all({ status }) as EntryRow[]).map(parseEntry);
 }
 
 // ---------------------------------------------------------------------------
 // Generated forms
 // ---------------------------------------------------------------------------
 
-export function getFormsForLexeme(
-  db: Database.Database,
-  lexemeKey: string
-): GeneratedForm[] {
-  const rows = db
-    .prepare('SELECT * FROM generated_forms WHERE lexeme_key = ? ORDER BY slot')
-    .all(lexemeKey) as FormRow[];
-  return rows.map(parseForm);
+export function getFormsForLexeme(db: DatabaseSync, lexemeKey: string): GeneratedForm[] {
+  return (db.prepare('SELECT * FROM generated_forms WHERE lexeme_key = $lexeme_key ORDER BY slot')
+    .all({ lexeme_key: lexemeKey }) as FormRow[]).map(parseForm);
 }
 
-export function getAllForms(db: Database.Database): GeneratedForm[] {
-  const rows = db
-    .prepare('SELECT * FROM generated_forms ORDER BY lexeme_key, slot')
-    .all() as FormRow[];
-  return rows.map(parseForm);
+export function getAllForms(db: DatabaseSync): GeneratedForm[] {
+  return (db.prepare('SELECT * FROM generated_forms ORDER BY lexeme_key, slot')
+    .all() as FormRow[]).map(parseForm);
 }
 
 // ---------------------------------------------------------------------------
 // Rules
 // ---------------------------------------------------------------------------
 
-export function getAllRules(db: Database.Database) {
-  const rows = db
-    .prepare('SELECT * FROM rules ORDER BY rule_kind, key')
-    .all() as RuleRow[];
-  return rows.map((r) => ({ ...r, data: JSON.parse(r.data_json) }));
+export function getAllRules(db: DatabaseSync) {
+  return (db.prepare('SELECT * FROM rules ORDER BY rule_kind, key').all() as RuleRow[])
+    .map((r) => ({ ...r, data: JSON.parse(r.data_json) }));
 }
 
-export function getRuleByKey(db: Database.Database, key: string) {
-  const row = db
-    .prepare('SELECT * FROM rules WHERE key = ?')
-    .get(key) as RuleRow | undefined;
+export function getRuleByKey(db: DatabaseSync, key: string) {
+  const row = db.prepare('SELECT * FROM rules WHERE key = $key').get({ key }) as RuleRow | undefined;
   return row ? { ...row, data: JSON.parse(row.data_json) } : null;
 }
 
-export function getRulesByKind(
-  db: Database.Database,
-  kind: 'inflection' | 'morphotactic' | 'syntax'
-) {
-  const rows = db
-    .prepare('SELECT * FROM rules WHERE rule_kind = ? ORDER BY key')
-    .all(kind) as RuleRow[];
-  return rows.map((r) => ({ ...r, data: JSON.parse(r.data_json) }));
+export function getRulesByKind(db: DatabaseSync, kind: string) {
+  return (db.prepare('SELECT * FROM rules WHERE rule_kind = $kind ORDER BY key')
+    .all({ kind }) as RuleRow[]).map((r) => ({ ...r, data: JSON.parse(r.data_json) }));
 }
 
 // ---------------------------------------------------------------------------
 // Examples
 // ---------------------------------------------------------------------------
 
-export function getExamplesForLexeme(db: Database.Database, lexemeKey: string) {
-  const rows = db
-    .prepare('SELECT * FROM examples WHERE lexeme_key = ?')
-    .all(lexemeKey) as Array<{
-    id: string;
-    lexeme_key: string;
-    source_lang_json: string;
-    gloss_line_json: string;
-    translation: string;
-    notes: string | null;
-    tags_json: string;
-    source_file: string;
+export function getExamplesForLexeme(db: DatabaseSync, lexemeKey: string) {
+  const rows = db.prepare('SELECT * FROM examples WHERE lexeme_key = $lexeme_key')
+    .all({ lexeme_key: lexemeKey }) as Array<{
+    id: string; lexeme_key: string;
+    source_lang_json: string; gloss_line_json: string;
+    translation: string; notes: string | null; tags_json: string; source_file: string;
   }>;
   return rows.map((r) => ({
     ...r,
@@ -241,9 +195,7 @@ export function getExamplesForLexeme(db: Database.Database, lexemeKey: string) {
 // Metadata
 // ---------------------------------------------------------------------------
 
-export function getDbMeta(db: Database.Database): Record<string, string> {
-  const rows = db
-    .prepare('SELECT key, value FROM db_meta')
-    .all() as Array<{ key: string; value: string }>;
-  return Object.fromEntries(rows.map((r) => [r.key, r.value]));
+export function getDbMeta(db: DatabaseSync): Record<string, string> {
+  const rows = db.prepare('SELECT key, value FROM db_meta').all() as Array<{ key: string; value: string }>;
+  return Object.fromEntries(rows.map((r) => [r['key'], r['value']]));
 }

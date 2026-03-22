@@ -7,13 +7,13 @@
  */
 
 import { Router, type Request, type Response } from 'express';
-import type Database from 'better-sqlite3';
+import type { DatabaseSync } from 'node:sqlite';
 import { getAllRules, getRuleByKey, getRulesByKind } from '../db.js';
 import { buildRuleIndex, generateForms } from '../../rules/inflection.js';
 import type { ValidatedInflectionRule } from '../../schema/validators.js';
 import type { NormalizedLexeme } from '../../pipeline/normalizer.js';
 
-export function rulesRouter(db: () => Database.Database): Router {
+export function rulesRouter(db: () => DatabaseSync): Router {
   const router = Router();
 
   // GET /api/rules
@@ -55,7 +55,7 @@ export function rulesRouter(db: () => Database.Database): Router {
       }
 
       // Build a minimal NormalizedLexeme from the DB entry for preview
-      const entryRow = db().prepare("SELECT * FROM entries WHERE key = ?").get(lexemeKey) as Record<string, unknown> | undefined;
+      const entryRow = db().prepare("SELECT * FROM entries WHERE key = $key").get({ key: lexemeKey }) as Record<string, unknown> | undefined;
       if (!entryRow) {
         return res.status(404).json({ error: `Lexeme "${lexemeKey}" not found` });
       }

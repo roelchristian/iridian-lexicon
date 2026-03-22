@@ -8,7 +8,7 @@
  */
 
 import { Router, type Request, type Response } from 'express';
-import type Database from 'better-sqlite3';
+import type { DatabaseSync } from 'node:sqlite';
 import { getDbMeta } from '../db.js';
 import { runPipelineAndRebuild } from '../pipeline-runner.js';
 import { validateOnly } from '../../pipeline/index.js';
@@ -17,7 +17,7 @@ import { runRuleEngine } from '../../rules/engine.js';
 import { syncGrammarArtifacts } from '../../export/sync.js';
 
 export function adminRouter(
-  db: () => Database.Database,
+  db: () => DatabaseSync,
   repoRoot: string
 ): Router {
   const router = Router();

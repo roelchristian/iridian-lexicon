@@ -16,13 +16,14 @@ import express from 'express';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import type Database from 'better-sqlite3';
+import type { DatabaseSync } from 'node:sqlite';
 
 import { openDb, needsRebuild } from '../db/builder.js';
 import { runPipelineAndRebuild } from './pipeline-runner.js';
 import { entriesRouter } from './routes/entries.js';
 import { rulesRouter } from './routes/rules.js';
 import { adminRouter } from './routes/admin.js';
+import { glossesRouter } from './routes/glosses.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -32,9 +33,9 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 // ---------------------------------------------------------------------------
 // DB singleton
 // ---------------------------------------------------------------------------
-let _db: Database.Database | null = null;
+let _db: DatabaseSync | null = null;
 
-function getDb(): Database.Database {
+function getDb(): DatabaseSync {
   if (!_db) throw new Error('DB not initialized');
   return _db;
 }
@@ -84,6 +85,7 @@ async function main() {
   app.use('/api/entries', entriesRouter(getDb, REPO_ROOT));
   app.use('/api/rules', rulesRouter(getDb));
   app.use('/api/admin', adminRouter(getDb, REPO_ROOT));
+  app.use('/api/glosses', glossesRouter(REPO_ROOT));
 
   // SPA fallback: serve index.html for /  and /manual
   const indexPath = path.join(PUBLIC_DIR, 'index.html');

@@ -15,7 +15,7 @@ import { Router, type Request, type Response } from 'express';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import type Database from 'better-sqlite3';
+import type { DatabaseSync } from 'node:sqlite';
 import {
   getAllEntries,
   getLexemes,
@@ -30,7 +30,7 @@ import {
 import { runPipelineAndRebuild } from '../pipeline-runner.js';
 
 export function entriesRouter(
-  db: () => Database.Database,
+  db: () => DatabaseSync,
   repoRoot: string
 ): Router {
   const router = Router();
@@ -208,6 +208,7 @@ function resolveFilePath(
     verb: 'verbs',
     modifier: 'modifiers',
     'function-word': 'function-words',
+    postposition: 'postpositions',
   };
   const subDir = dirMap[cat] ?? 'nouns';
   return path.join(repoRoot, 'lexemes', subDir, `${safeKey}.yaml`);
