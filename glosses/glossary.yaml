@@ -1,0 +1,342 @@
+# Iridian Lexicon — Gloss Abbreviation Registry
+#
+# This file is the single source of truth for what every gloss abbreviation
+# means.  The web app reads it at startup and displays expansion tooltips
+# wherever slot labels appear (e.g. hovering "PV" in "PV.PERF.NMLZ").
+#
+# Slot labels are split naively on . - = before lookup, so you can use any
+# of those as separators and every component is looked up independently.
+#
+# Fields per entry:
+#   expansion   — full human-readable label (required)
+#   description — one-sentence explanation (optional but recommended)
+#   domain      — category label, e.g. "case", "aspect", "voice" (optional)
+#
+# Leipzig Glossing Rules abbreviations are marked with domain: "leipzig".
+# Language-specific (Iridian) abbreviations use domain: "iridian".
+# Add as many as you need — there is no closed set enforced anywhere.
+
+schema_version: "1.0"
+
+glosses:
+
+  # ── Case ──────────────────────────────────────────────────────────────
+  NOM:
+    expansion: nominative
+    description: Marks the subject of an intransitive verb or the agent of a transitive verb in nominative-accusative alignment.
+    domain: case
+
+  ACC:
+    expansion: accusative
+    description: Marks the patient or direct object of a transitive verb.
+    domain: case
+
+  DAT:
+    expansion: dative
+    description: Marks the recipient or beneficiary of an action.
+    domain: case
+
+  GEN:
+    expansion: genitive
+    description: Marks a possessor or source; also used adnominally.
+    domain: case
+
+  LOC:
+    expansion: locative
+    description: Marks the location where an action takes place.
+    domain: case
+
+  ABL:
+    expansion: ablative
+    description: Marks the source or starting point of movement.
+    domain: case
+
+  INSTR:
+    expansion: instrumental
+    description: Marks the instrument or means by which an action is performed.
+    domain: case
+
+  VOC:
+    expansion: vocative
+    description: Marks a noun used in direct address.
+    domain: case
+
+  # ── Number ────────────────────────────────────────────────────────────
+  SG:
+    expansion: singular
+    description: Refers to a single entity.
+    domain: number
+
+  PL:
+    expansion: plural
+    description: Refers to more than one entity.
+    domain: number
+
+  DU:
+    expansion: dual
+    description: Refers to exactly two entities.
+    domain: number
+
+  # ── Person ────────────────────────────────────────────────────────────
+  1:
+    expansion: first person
+    description: The speaker or a group including the speaker.
+    domain: person
+
+  2:
+    expansion: second person
+    description: The addressee or a group including the addressee.
+    domain: person
+
+  3:
+    expansion: third person
+    description: A party other than the speaker or addressee.
+    domain: person
+
+  1SG:
+    expansion: first person singular
+    description: The speaker alone.
+    domain: person+number
+
+  2SG:
+    expansion: second person singular
+    description: The addressee alone.
+    domain: person+number
+
+  3SG:
+    expansion: third person singular
+    description: A single third party.
+    domain: person+number
+
+  1PL:
+    expansion: first person plural
+    description: The speaker and others.
+    domain: person+number
+
+  2PL:
+    expansion: second person plural
+    description: The addressee and others.
+    domain: person+number
+
+  3PL:
+    expansion: third person plural
+    description: Multiple third parties.
+    domain: person+number
+
+  # ── Tense ─────────────────────────────────────────────────────────────
+  PRS:
+    expansion: present
+    description: Situates the event at or around the time of speaking.
+    domain: tense
+
+  PST:
+    expansion: past
+    description: Situates the event before the time of speaking.
+    domain: tense
+
+  FUT:
+    expansion: future
+    description: Situates the event after the time of speaking.
+    domain: tense
+
+  # ── Aspect ────────────────────────────────────────────────────────────
+  PERF:
+    expansion: perfective
+    description: Presents the event as a bounded whole, completed or viewed from outside.
+    domain: aspect
+
+  PROG:
+    expansion: progressive
+    description: Presents the event as ongoing or in progress at the reference time.
+    domain: aspect
+
+  IPFV:
+    expansion: imperfective
+    description: Presents the event as ongoing, habitual, or not bounded.
+    domain: aspect
+
+  PFV:
+    expansion: perfective
+    description: Presents the event as a bounded whole (alternate abbreviation).
+    domain: aspect
+
+  HAB:
+    expansion: habitual
+    description: Marks an action that recurs regularly or characteristically.
+    domain: aspect
+
+  INCH:
+    expansion: inchoative
+    description: Marks the beginning of a state or process.
+    domain: aspect
+
+  # ── Mood ──────────────────────────────────────────────────────────────
+  IND:
+    expansion: indicative
+    description: The default realis mood; asserts a proposition as true.
+    domain: mood
+
+  SBJV:
+    expansion: subjunctive
+    description: Marks irrealis or dependent clauses.
+    domain: mood
+
+  IMP:
+    expansion: imperative
+    description: Marks a command or directive.
+    domain: mood
+
+  COND:
+    expansion: conditional
+    description: Marks a conditional or hypothetical proposition.
+    domain: mood
+
+  # ── Voice / Alignment (Iridian-specific) ──────────────────────────────
+  PV:
+    expansion: patientive voice
+    description: >
+      The verb form in which the patient argument is cross-referenced by
+      agreement morphology. The patient is syntactically prominent.
+    domain: iridian-voice
+
+  ANTIP:
+    expansion: antipassive
+    description: >
+      Demotes the patient argument; the agent is cross-referenced.
+      Triggers the k→č stem alternation in Class-I verb roots.
+    domain: iridian-voice
+
+  ALIGN:
+    expansion: alignment
+    description: Generic label for the voice/alignment slot (PV or ANTIP).
+    domain: iridian-voice
+
+  # ── Polarity ──────────────────────────────────────────────────────────
+  NEG:
+    expansion: negation
+    description: Marks propositional or constituent negation; realized as prefix zá- in Iridian.
+    domain: polarity
+
+  AFF:
+    expansion: affirmative
+    description: Marks explicit affirmation (unmarked in most languages).
+    domain: polarity
+
+  # ── Nominalization / Derived categories ───────────────────────────────
+  NMLZ:
+    expansion: nominalization
+    description: Deverbal suffix forming a noun from a verb stem. The lexeme major_category remains 'verb'.
+    domain: derivation
+
+  ADJZ:
+    expansion: adjectivalization
+    description: Derivational suffix forming a modifier from a noun or verb stem.
+    domain: derivation
+
+  CAUS:
+    expansion: causative
+    description: Marks a causative construction; the causer is introduced as an additional argument.
+    domain: derivation
+
+  PASS:
+    expansion: passive
+    description: Demotes the agent; the patient becomes the grammatical subject.
+    domain: voice
+
+  REFL:
+    expansion: reflexive
+    description: Marks coreference between the subject and the object.
+    domain: voice
+
+  RECP:
+    expansion: reciprocal
+    description: Marks mutual action between participants.
+    domain: voice
+
+  # ── Definiteness / Reference ───────────────────────────────────────────
+  DEF:
+    expansion: definite
+    description: Marks a referent as identifiable to the addressee.
+    domain: definiteness
+
+  INDF:
+    expansion: indefinite
+    description: Marks a referent as not specifically identified.
+    domain: definiteness
+
+  PROX:
+    expansion: proximal
+    description: Marks a referent as close to the speaker.
+    domain: deixis
+
+  DIST:
+    expansion: distal
+    description: Marks a referent as far from the speaker.
+    domain: deixis
+
+  # ── Information structure ─────────────────────────────────────────────
+  TOP:
+    expansion: topic
+    description: Marks the topic of a sentence or discourse segment.
+    domain: information-structure
+
+  FOC:
+    expansion: focus
+    description: Marks the focused or new-information constituent.
+    domain: information-structure
+
+  # ── Miscellaneous Leipzig ─────────────────────────────────────────────
+  QUOT:
+    expansion: quotative
+    description: Marks reported speech or evidential quotation.
+    domain: evidentiality
+
+  EVID:
+    expansion: evidential
+    description: Marks the source of information (direct, reported, inferential).
+    domain: evidentiality
+
+  PTCP:
+    expansion: participle
+    description: A non-finite verb form functioning as a modifier.
+    domain: non-finite
+
+  INF:
+    expansion: infinitive
+    description: A non-finite verb form used in complement clauses and lexical citation.
+    domain: non-finite
+
+  CONV:
+    expansion: converb
+    description: A non-finite verb form expressing adverbial subordination.
+    domain: non-finite
+
+  CL:
+    expansion: classifier
+    description: A noun class or numeral classifier morpheme.
+    domain: nominal
+
+  AUGM:
+    expansion: augmentative
+    description: Marks increased size, intensity, or negative connotation.
+    domain: degree
+
+  DIM:
+    expansion: diminutive
+    description: Marks small size or affectionate/pejorative connotation.
+    domain: degree
+
+  DIR:
+    expansion: direct case
+    description: Marks the core argument (subject of intransitive or agent of transitive) in a direct alignment system. Corresponds to the absolutive case in standard linguistic terminology.
+    domain: case
+  
+  TRS:
+    expansion: transitive case
+    description: Marks the agent of a transitive verb in a transitive alignment system. Corresponds to the ergative case in standard linguistic terminology.
+    domain: case
+
+  IND:
+    expansion: indirect case
+    description: Marks oblique arguments, including indirect objects, locations, and other non-core roles.
+    domain: case
