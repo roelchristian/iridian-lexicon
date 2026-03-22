@@ -10,6 +10,7 @@ export type MajorCategory =
   | 'verb'
   | 'modifier'
   | 'function-word'
+  | 'postposition'
   | 'prefix'
   | 'suffix'
   | 'infix'
