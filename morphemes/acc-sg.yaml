@@ -1,0 +1,25 @@
+schema_version: "1.0"
+id: "acc-sg-001"
+key: "ACC.SG"
+lemma: "-an"
+display_lemma: "-an"
+entry_kind: morpheme
+major_category: suffix
+subtype: case-suffix
+glosses:
+  - "accusative singular"
+notes: >
+  Object case marker for singular nominals.
+tags:
+  - case
+  - accusative
+  - singular
+status: active
+display_form: "-an"
+gloss_abbr: "ACC.SG"
+slot: case
+category: case-system
+allomorph_rules:
+  - context: "stem ends in nasal"
+    form: "-nan"
+    condition: nasal-gemination

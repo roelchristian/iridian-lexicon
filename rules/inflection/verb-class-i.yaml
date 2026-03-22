@@ -1,0 +1,101 @@
+schema_version: "1.0"
+id: "verb-class-i-001"
+key: "verb-class-i"
+name: "Verb Class I — Basic Conjugation"
+description: >
+  The primary verbal conjugation class. Covers present and past tense
+  with three persons in two numbers. Uses the base stem throughout.
+category: verb
+feature_axes:
+  - ["PRS", "PST"]
+  - ["1", "2", "3"]
+  - ["SG", "PL"]
+cells:
+  - slot: "PRS.1SG"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "1" }
+      - { feature: number, value: SG }
+    suffix: "-om"
+    stem_variant: base
+  - slot: "PRS.2SG"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "2" }
+      - { feature: number, value: SG }
+    suffix: "-eth"
+    stem_variant: base
+  - slot: "PRS.3SG"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "3" }
+      - { feature: number, value: SG }
+    suffix: "-ar"
+    stem_variant: base
+  - slot: "PRS.1PL"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "1" }
+      - { feature: number, value: PL }
+    suffix: "-omath"
+    stem_variant: base
+  - slot: "PRS.2PL"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "2" }
+      - { feature: number, value: PL }
+    suffix: "-ethim"
+    stem_variant: base
+  - slot: "PRS.3PL"
+    features:
+      - { feature: tense, value: PRS }
+      - { feature: person, value: "3" }
+      - { feature: number, value: PL }
+    suffix: "-arath"
+    stem_variant: base
+  - slot: "PST.1SG"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "1" }
+      - { feature: number, value: SG }
+    suffix: "-omen"
+    stem_variant: base
+  - slot: "PST.2SG"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "2" }
+      - { feature: number, value: SG }
+    suffix: "-ethen"
+    stem_variant: base
+  - slot: "PST.3SG"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "3" }
+      - { feature: number, value: SG }
+    suffix: "-arn"
+    stem_variant: base
+  - slot: "PST.1PL"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "1" }
+      - { feature: number, value: PL }
+    suffix: "-omenthi"
+    stem_variant: base
+  - slot: "PST.2PL"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "2" }
+      - { feature: number, value: PL }
+    suffix: "-ethnim"
+    stem_variant: base
+  - slot: "PST.3PL"
+    features:
+      - { feature: tense, value: PST }
+      - { feature: person, value: "3" }
+      - { feature: number, value: PL }
+    suffix: "-arnthi"
+    stem_variant: base
+tags:
+  - verbal
+  - class-i
+notes: "Regular class for most basic verbs. Class II verbs use a weak stem in past tense."

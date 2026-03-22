@@ -1,0 +1,26 @@
+schema_version: "1.0"
+id: "nom-sg-001"
+key: "NOM.SG"
+lemma: "-a"
+display_lemma: "-a"
+entry_kind: morpheme
+major_category: suffix
+subtype: case-suffix
+glosses:
+  - "nominative singular"
+notes: >
+  The basic subject case marker for singular nominals. Attaches to the
+  base stem. Allomorph -ra appears after vowel-final stems.
+tags:
+  - case
+  - nominative
+  - singular
+status: active
+display_form: "-a"
+gloss_abbr: "NOM.SG"
+slot: case
+category: case-system
+allomorph_rules:
+  - context: "stem ends in vowel"
+    form: "-ra"
+    condition: vowel-sandhi

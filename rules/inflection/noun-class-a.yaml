@@ -1,0 +1,65 @@
+schema_version: "1.0"
+id: "noun-class-a-001"
+key: "noun-class-a"
+name: "Noun Class A — Primary Declension"
+description: >
+  The primary nominal declension for common nouns. Covers four cases
+  (nominative, accusative, dative, genitive) in two numbers (singular, plural).
+  Suffixes attach to the strong stem variant.
+category: noun
+feature_axes:
+  - ["NOM", "ACC", "DAT", "GEN"]
+  - ["SG", "PL"]
+cells:
+  - slot: "NOM.SG"
+    features:
+      - { feature: case, value: NOM }
+      - { feature: number, value: SG }
+    suffix: "-a"
+    stem_variant: base
+  - slot: "ACC.SG"
+    features:
+      - { feature: case, value: ACC }
+      - { feature: number, value: SG }
+    suffix: "-an"
+    stem_variant: base
+  - slot: "DAT.SG"
+    features:
+      - { feature: case, value: DAT }
+      - { feature: number, value: SG }
+    suffix: "-eth"
+    stem_variant: base
+  - slot: "GEN.SG"
+    features:
+      - { feature: case, value: GEN }
+      - { feature: number, value: SG }
+    suffix: "-i"
+    stem_variant: base
+  - slot: "NOM.PL"
+    features:
+      - { feature: case, value: NOM }
+      - { feature: number, value: PL }
+    suffix: "-ath"
+    stem_variant: base
+  - slot: "ACC.PL"
+    features:
+      - { feature: case, value: ACC }
+      - { feature: number, value: PL }
+    suffix: "-anthi"
+    stem_variant: base
+  - slot: "DAT.PL"
+    features:
+      - { feature: case, value: DAT }
+      - { feature: number, value: PL }
+    suffix: "-ethim"
+    stem_variant: base
+  - slot: "GEN.PL"
+    features:
+      - { feature: case, value: GEN }
+      - { feature: number, value: PL }
+    suffix: "-inthi"
+    stem_variant: base
+tags:
+  - nominal
+  - class-a
+notes: "The most common nominal declension class. Irregular genitives plural in -anthi occur for some body-part nouns."

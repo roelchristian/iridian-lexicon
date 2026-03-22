@@ -1,0 +1,26 @@
+schema_version: "1.0"
+id: "nominal-template-001"
+key: "nominal-slots"
+name: "Nominal word template"
+description: >
+  Slot ordering and co-occurrence constraints for nominal word forms.
+  The stem slot is always position 0; case is mandatory; number is
+  encoded as part of the case suffix in Class A nouns.
+word_class: noun
+slots:
+  - name: stem
+    position: 0
+    required: true
+  - name: case
+    position: 1
+    required: true
+  - name: definiteness
+    position: 2
+    required: false
+alternations:
+  - name: vowel-final-stem
+    context: "stem ends in a vowel"
+    result: "insert -r- before vowel-initial suffixes"
+tags:
+  - nominal
+notes: ""

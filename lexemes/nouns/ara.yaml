@@ -1,0 +1,51 @@
+schema_version: "1.0"
+id: "ara-001"
+key: "ara"
+lemma: "ara"
+display_lemma: "āra"
+entry_kind: lexeme
+major_category: noun
+subtype: common-noun
+glosses:
+  - "water"
+  - "liquid, fluid"
+notes: >
+  Primary term for water and liquid substances. Widely used in compound
+  formation: āra-keth (riverwater), āra-mir (well, lit. water-pit).
+  Historically derived from Proto-Iridian *aʀa.
+tags:
+  - nature
+  - substance
+  - high-frequency
+status: active
+template_id: noun-class-a
+stem_variants:
+  - label: base
+    form: "ar"
+manual_overrides:
+  GEN.PL: "aranthi"
+usage_examples:
+  - id: "ex-ara-001"
+    source_lang:
+      - type: form
+        key: ara
+        slot: "NOM.SG"
+      - type: literal
+        literal: "keth"
+      - type: form
+        key: mir
+        slot: "ACC.SG"
+    gloss_line:
+      - type: gloss
+        gloss: "water.NOM.SG"
+      - type: gloss
+        gloss: "river"
+      - type: gloss
+        gloss: "flow.PST.3SG"
+    translation: "The water flowed through the river."
+    notes: "Canonical SOV word order example."
+    tags:
+      - sov
+      - nature
+attested_in:
+  - "corpus-vol1-ch3"

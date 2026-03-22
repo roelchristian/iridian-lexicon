@@ -1,0 +1,31 @@
+schema_version: "1.0"
+id: "basic-sov-001"
+key: "basic-sov"
+name: "Basic SOV transitive clause"
+description: >
+  Subject-Object-Verb order for basic transitive clauses in Iridian.
+  The subject is in nominative case, the object in accusative, the verb
+  agrees with the subject in person and number.
+word_order: SOV
+strict_order: true
+constraints:
+  - position: 0
+    required_type: form
+    required_slot: "NOM.SG"
+    label: subject
+    optional: false
+  - position: 1
+    required_type: form
+    required_slot: "ACC.SG"
+    label: object
+    optional: false
+  - position: 2
+    required_type: form
+    label: verb
+    optional: false
+tags:
+  - transitive
+  - SOV
+notes: >
+  Iridian is consistently head-final. Adjectives precede the noun they
+  modify. Postpositions follow their complement.

@@ -1,0 +1,25 @@
+schema_version: "1.0"
+id: "ka-001"
+key: "ka"
+lemma: "ka"
+display_lemma: "ka"
+entry_kind: lexeme
+major_category: function-word
+subtype: postposition
+glosses:
+  - "in, within (locative)"
+  - "inside of"
+notes: >
+  General locative postposition. Governs the dative case.
+  Contrasts with eth (at, by) and thur (through, across).
+tags:
+  - spatial
+  - postposition
+  - locative
+status: active
+inflection_profile: "invariant"
+stem_variants: []
+manual_overrides: {}
+usage_examples: []
+attested_in:
+  - "corpus-vol1-ch1"

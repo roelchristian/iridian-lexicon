@@ -1,0 +1,23 @@
+schema_version: "1.0"
+id: "mira-001"
+key: "mira"
+lemma: "mira"
+display_lemma: "mīra"
+entry_kind: lexeme
+major_category: modifier
+subtype: adjective
+glosses:
+  - "flowing, fluid"
+  - "moving, in motion"
+notes: >
+  Participial adjective derived from the verb mir (to flow).
+  Attributive use precedes the noun. Predicative use takes the copula.
+tags:
+  - nature
+  - derived
+status: active
+inflection_profile: "uninflected-modifier"
+stem_variants: []
+manual_overrides: {}
+usage_examples: []
+attested_in: []

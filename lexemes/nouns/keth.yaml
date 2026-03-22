@@ -1,0 +1,26 @@
+schema_version: "1.0"
+id: "keth-001"
+key: "keth"
+lemma: "keth"
+display_lemma: "keth"
+entry_kind: lexeme
+major_category: noun
+subtype: common-noun
+glosses:
+  - "river"
+  - "stream, watercourse"
+notes: >
+  The general word for river. Distinguishes from mir (well, cistern)
+  and thureth (sea, large body of water).
+tags:
+  - nature
+  - geography
+status: active
+template_id: noun-class-a
+stem_variants:
+  - label: base
+    form: "keth"
+manual_overrides: {}
+usage_examples: []
+attested_in:
+  - "corpus-vol1-ch1"

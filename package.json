@@ -1,0 +1,35 @@
+{
+  "name": "iridian-lexicon",
+  "version": "0.1.0",
+  "description": "Canonical lexical data, rule sets, and editing app for the Iridian constructed language",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev:app": "tsx watch src/app/server.ts",
+    "cli": "tsx src/cli/index.ts",
+    "validate": "tsx src/cli/index.ts validate",
+    "rebuild": "tsx src/cli/index.ts rebuild",
+    "export": "tsx src/cli/index.ts export",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^4.17.21",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.16.1",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  }
+}

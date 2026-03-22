@@ -1,0 +1,44 @@
+schema_version: "1.0"
+id: "mir-001"
+key: "mir"
+lemma: "mir"
+display_lemma: "mir"
+entry_kind: lexeme
+major_category: verb
+subtype: intransitive-verb
+glosses:
+  - "to flow"
+  - "to move (of water, air)"
+notes: >
+  Basic verb of motion for fluids. Becomes transitive in the causative
+  with the prefix ka- (kamir: to pour, to cause to flow).
+  Also used metaphorically for the flow of time.
+tags:
+  - motion
+  - nature
+  - high-frequency
+status: active
+template_id: verb-class-i
+stem_variants:
+  - label: base
+    form: "mir"
+manual_overrides:
+  PST.3SG: "miren"
+usage_examples:
+  - id: "ex-mir-001"
+    source_lang:
+      - type: form
+        key: ara
+        slot: "NOM.SG"
+      - type: form
+        key: mir
+        slot: "PST.3SG"
+    gloss_line:
+      - type: gloss
+        gloss: "water.NOM.SG"
+      - type: gloss
+        gloss: "flow.PST.3SG"
+    translation: "The water flowed."
+    notes: "Intransitive use with nominative subject."
+attested_in:
+  - "corpus-vol1-ch3"
