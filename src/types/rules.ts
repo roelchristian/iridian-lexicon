@@ -68,6 +68,9 @@ export interface InflectionRule {
   /** Human-readable stable key, e.g. "noun-class-a", "strong-verb-ii". */
   key: string;
 
+  /** Short UI label, e.g. "Class I". Falls back to name when omitted. */
+  friendly_name?: string;
+
   /** Descriptive name shown in the app UI. */
   name: string;
 

@@ -189,6 +189,7 @@ export const InflectionRuleSchema = z.object({
   schema_version: z.string().min(1),
   id: z.string().regex(/^[a-z0-9-]+$/),
   key: z.string().regex(/^[a-zA-Z0-9_.:-]+$/),
+  friendly_name: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().optional().default(''),
   category: z.string().min(1),
