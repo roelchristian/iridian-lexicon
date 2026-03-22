@@ -1397,6 +1397,20 @@ const App = (() => {
     else if (drawerMode === 'new-morpheme' || drawerMode === 'edit-morpheme') await saveMorpheme();
   }
 
+  // ── Lemma key normalization ───────────────────────────────────────────
+  // Replaces háček letters with digraphs, keeps accent marks, lowercases.
+  function normalizeLemmaToKey(lemma) {
+    return lemma
+      .toLowerCase()
+      .replace(/š/g, 'sh').replace(/č/g, 'ch').replace(/ž/g, 'zh')
+      .replace(/đ/g, 'dj').replace(/ć/g, 'ch').replace(/ř/g, 'rz')
+      .replace(/ě/g, 'e') .replace(/ñ/g, 'n')
+      // keep a-z, accent marks, digits, hyphens; collapse everything else to hyphen
+      .replace(/[^a-záéíóúýàèìòùāēīōūäëïöüãõ0-9-]/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   // ── Entry editor (drawer) ─────────────────────────────────────────────
   function openEntryEditor(key) {
     drawerMode = key ? 'edit-entry' : 'new-entry';
@@ -1406,14 +1420,44 @@ const App = (() => {
     document.getElementById('drawer-save-btn').textContent = 'Save';
 
     const entry = key ? (currentEntry?.key === key ? currentEntry : null) : null;
-    document.getElementById('drawer-body').innerHTML = buildEntryForm(entry, !!key);
+    const isEdit = !!key;
+    document.getElementById('drawer-body').innerHTML = buildEntryForm(entry, isEdit);
     bindStemButtons();
     bindOverrideButtons();
     bindEntrySuggestionControls();
+    bindLemmaAutofill(isEdit);
     if (entry?.template_id) setInflectionToggle('template');
     else if (entry?.inflection_profile) setInflectionToggle('profile');
     else setInflectionToggle('template');
     openDrawer();
+  }
+
+  function bindLemmaAutofill(isEdit) {
+    const lemmaEl   = document.getElementById('ef-lemma');
+    const displayEl = document.getElementById('ef-display-lemma');
+    const keyEl     = document.getElementById('ef-key');
+    if (!lemmaEl) return;
+
+    // Track whether the user has manually touched the display lemma field
+    let displayTouched = isEdit && !!displayEl?.value;
+    displayEl?.addEventListener('input', () => { displayTouched = true; });
+
+    lemmaEl.addEventListener('input', () => {
+      const lemma = lemmaEl.value;
+
+      // Auto-derive key from lemma (always readonly, so we just set .value)
+      if (!isEdit && keyEl) keyEl.value = normalizeLemmaToKey(lemma);
+
+      // Auto-fill display lemma only if not manually overridden
+      if (!displayTouched && displayEl) displayEl.value = lemma;
+
+      // Keep the auto-created base row in sync
+      const baseRow = document.querySelector('#sv-list .dyn-row.sv[data-auto-base]');
+      if (baseRow) {
+        const formInput = baseRow.querySelectorAll('input')[1];
+        if (formInput) formInput.value = lemma;
+      }
+    });
   }
 
   // ── Morpheme editor (drawer) ──────────────────────────────────────────
@@ -1695,12 +1739,11 @@ const App = (() => {
       ...selectedTags,
       ...entrySuggestions.tags.filter((tag) => !selectedTags.includes(tag)),
     ].slice(0, 8);
-    const sv = (e?.stem_variants ?? []).map(s =>
-      `<div class="dyn-row sv">
-        <input placeholder="label (e.g. base)" value="${esc(s.label)}">
-        <input placeholder="form (e.g. piašt)" value="${esc(s.form)}">
-        <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>
-       </div>`).join('');
+    // Build stem variant rows; for new entries pre-add a 'base' row
+    const existingSv = e?.stem_variants ?? [];
+    const svRows = existingSv.length
+      ? existingSv.map(s => makeSvRowHtml(s.label, s.form, false)).join('')
+      : makeSvRowHtml('base', e?.lemma ?? '', true);  // pre-filled base for new entries
     const mo = Object.entries(e?.manual_overrides ?? {}).map(([slot, form]) =>
       `<div class="dyn-row mo">
         <input placeholder="slot (e.g. GEN.PL)" value="${esc(slot)}">
@@ -1748,8 +1791,8 @@ const App = (() => {
       <div class="ed-section">Identity</div>
       <div class="field-row2">
         <div class="field">
-          <label>Key</label>
-          <input type="text" id="ef-key" value="${esc(e?.key)}" ${isEdit ? 'readonly' : ''} placeholder="e.g. piasht">
+          <label>Key <span class="opt">(auto-generated from lemma)</span></label>
+          <input type="text" id="ef-key" value="${esc(e?.key)}" readonly placeholder="derived from lemma" style="opacity:0.7;cursor:default">
         </div>
         <div class="field">
           <label>Status</label>
@@ -1822,8 +1865,12 @@ const App = (() => {
       </div>
 
       <div class="ed-section">Stem Variants</div>
-      <div class="dyn-list" id="sv-list">${sv}</div>
-      <button class="add-row-btn" id="add-sv">+ Add stem variant</button>
+      <div class="dyn-list" id="sv-list">${svRows}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button class="add-row-btn" id="add-sv">+ Add</button>
+        <button class="add-row-btn" id="add-sv-reduced" title="Adds a 'reduced' stem variant">+ Reduced</button>
+        <button class="add-row-btn" id="add-sv-reduced-hs" title="Adds 'reduced-hard' and 'reduced-soft' stem variants">+ Reduced (hard &amp; soft)</button>
+      </div>
 
       <div class="ed-section">Manual Overrides</div>
       <div class="dyn-list" id="mo-list">${mo}</div>
@@ -1832,12 +1879,38 @@ const App = (() => {
     `;
   }
 
+  function makeSvRowHtml(label, form, isAutoBase) {
+    return `<div class="dyn-row sv"${isAutoBase ? ' data-auto-base="true"' : ''}>
+      <input placeholder="label (e.g. base)" value="${esc(label)}">
+      <input placeholder="form" value="${esc(form)}">
+      <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>
+    </div>`;
+  }
+
+  function addSvRow(label = '', form = '', isAutoBase = false) {
+    if (label) {
+      const dupe = [...document.querySelectorAll('#sv-list .dyn-row.sv input:first-child')]
+        .some(i => i.value.trim() === label);
+      if (dupe) { toast(`Stem variant "${label}" already exists`, 'error'); return false; }
+    }
+    const row = document.createElement('div');
+    row.className = 'dyn-row sv';
+    if (isAutoBase) row.dataset.autoBase = 'true';
+    row.innerHTML = `<input placeholder="label (e.g. base)" value="${esc(label)}"><input placeholder="form" value="${esc(form)}"><button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>`;
+    document.getElementById('sv-list').appendChild(row);
+    return true;
+  }
+
   function bindStemButtons() {
-    document.getElementById('add-sv').onclick = () => {
-      const row = document.createElement('div');
-      row.className = 'dyn-row sv';
-      row.innerHTML = `<input placeholder="label"><input placeholder="form"><button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>`;
-      document.getElementById('sv-list').appendChild(row);
+    document.getElementById('add-sv').onclick = () => addSvRow();
+
+    document.getElementById('add-sv-reduced').onclick = () => {
+      addSvRow('reduced', '');
+    };
+
+    document.getElementById('add-sv-reduced-hs').onclick = () => {
+      addSvRow('reduced-hard', '');
+      addSvRow('reduced-soft', '');
     };
   }
 
@@ -1964,7 +2037,7 @@ const App = (() => {
     const payload = {
       schema_version: '1.0',
       entry_kind: 'lexeme',
-      id: document.getElementById('ef-key').value.trim().replace(/[^a-z0-9-]/g, '-'),
+      id: document.getElementById('ef-key').value.trim(),
       key: document.getElementById('ef-key').value.trim(),
       lemma: document.getElementById('ef-lemma').value.trim(),
       display_lemma: document.getElementById('ef-display-lemma').value.trim(),
