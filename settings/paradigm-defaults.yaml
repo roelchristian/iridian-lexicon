@@ -1,0 +1,561 @@
+# Iridian Lexicon — Paradigm Quick-Fill Defaults
+#
+# These templates define what "Add Full Paradigm" means for each major
+# category in the rule editor.  Edit this file freely to match the
+# morphological structure of Iridian.
+#
+# suffix is intentionally left empty in all templates — you fill in the
+# actual phonological suffix for each cell after the quick-fill button
+# inserts the slot structure.
+#
+# For verbs, neg_cells are the negated variants.  The prefix field is
+# filled at insertion time based on the NEG-prefix radio selection
+# (standard zá, variant zad, or irregular = neg_cells not inserted).
+schema_version: "1.0"
+
+noun:
+  description: >
+    Six-slot nominal paradigm: three cases (DIR / TRS / IND) each with a
+    plain and a definite (DEF) form. Edit to add number (SG/PL), additional
+    cases, or other nominal categories.
+  cells:
+    - slot: DIR
+      suffix: ""
+      features:
+        - { feature: case, value: DIR }
+
+    - slot: TRS
+      suffix: ""
+      features:
+        - { feature: case, value: TRS }
+
+    - slot: IND
+      suffix: ""
+      features:
+        - { feature: case, value: IND }
+
+    - slot: DIR.DEF
+      suffix: ""
+      features:
+        - { feature: case, value: DIR }
+        - { feature: definiteness, value: DEF }
+
+    - slot: TRS.DEF
+      suffix: ""
+      features:
+        - { feature: case, value: TRS }
+        - { feature: definiteness, value: DEF }
+
+    - slot: IND.DEF
+      suffix: ""
+      features:
+        - { feature: case, value: IND }
+        - { feature: definiteness, value: DEF }
+
+verb:
+  description: >
+    Iridian finite verb quick-fill paradigm. The stem template is:
+    ROOT – CAUS – {ANTIP / APPL / Ø} – finite ending.
+    ANTIP and APPL are mutually exclusive because they occupy the same slot.
+    CAUS occupies the slot before ANTIP/APPL and may combine with either of
+    them or with the plain stem. PASS forms are kept as a separate stem
+    series. Person is not inflected on the verb itself; optional clitics
+    attach after the finite form.
+
+    Negative forms are kept in neg_cells for machine-reader compatibility.
+    The negative layer mirrors the full indicative paradigm.
+
+  neg_prefixes:
+    - value: "zá"
+      label: "zá (standard)"
+    - value: "zad"
+      label: "zad (variant)"
+
+  cells:
+    - slot: ANTIP.PF
+      suffix: "ek"
+      stem_variant: antip
+      features:
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PF }
+
+    - slot: TRS.PF
+      suffix: "nik"
+      features:
+        - { feature: voice, value: TRS }
+        - { feature: aspect, value: PF }
+
+    - slot: APPL.PF
+      suffix: "nik"
+      stem_variant: appl
+      features:
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PF }
+
+    - slot: CAUS.PF
+      suffix: "nik"
+      stem_variant: caus
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: PF }
+
+    - slot: CAUS.ANTIP.PF
+      suffix: "ek"
+      stem_variant: caus_antip
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PF }
+
+    - slot: CAUS.APPL.PF
+      suffix: "nik"
+      stem_variant: caus_appl
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PF }
+
+    - slot: ANTIP.RET
+      suffix: "ac"
+      stem_variant: antip
+      features:
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: RET }
+
+    - slot: TRS.RET
+      suffix: "nac"
+      features:
+        - { feature: voice, value: TRS }
+        - { feature: aspect, value: RET }
+
+    - slot: APPL.RET
+      suffix: "nac"
+      stem_variant: appl
+      features:
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: RET }
+
+    - slot: CAUS.RET
+      suffix: "nac"
+      stem_variant: caus
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: RET }
+
+    - slot: CAUS.ANTIP.RET
+      suffix: "ac"
+      stem_variant: caus_antip
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: RET }
+
+    - slot: CAUS.APPL.RET
+      suffix: "nac"
+      stem_variant: caus_appl
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: RET }
+
+    - slot: CONT
+      suffix: "a"
+      features:
+        - { feature: aspect, value: CONT }
+
+    - slot: APPL.CONT
+      suffix: "a"
+      stem_variant: appl
+      features:
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CONT }
+
+    - slot: CAUS.CONT
+      suffix: "a"
+      stem_variant: caus
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: CONT }
+
+    - slot: CAUS.ANTIP.CONT
+      suffix: "a"
+      stem_variant: caus_antip
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: CONT }
+
+    - slot: CAUS.APPL.CONT
+      suffix: "a"
+      stem_variant: caus_appl
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CONT }
+
+    - slot: PROG
+      suffix: "ime"
+      features:
+        - { feature: aspect, value: PROG }
+
+    - slot: APPL.PROG
+      suffix: "ime"
+      stem_variant: appl
+      features:
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PROG }
+
+    - slot: CAUS.PROG
+      suffix: "ime"
+      stem_variant: caus
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: PROG }
+
+    - slot: CAUS.ANTIP.PROG
+      suffix: "ime"
+      stem_variant: caus_antip
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PROG }
+
+    - slot: CAUS.APPL.PROG
+      suffix: "ime"
+      stem_variant: caus_appl
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PROG }
+
+    - slot: CTPV
+      suffix: "ach"
+      features:
+        - { feature: aspect, value: CTPV }
+
+    - slot: APPL.CTPV
+      suffix: "ach"
+      stem_variant: appl
+      features:
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CTPV }
+
+    - slot: CAUS.CTPV
+      suffix: "ach"
+      stem_variant: caus
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: CTPV }
+
+    - slot: CAUS.ANTIP.CTPV
+      suffix: "ach"
+      stem_variant: caus_antip
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: CTPV }
+
+    - slot: CAUS.APPL.CTPV
+      suffix: "ach"
+      stem_variant: caus_appl
+      features:
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CTPV }
+
+    - slot: PASS.CONT
+      suffix: "na"
+      stem_variant: pass
+      features:
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: CONT }
+
+    - slot: PASS.PROG
+      suffix: "nime"
+      stem_variant: pass
+      features:
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: PROG }
+
+    - slot: PASS.CTPV
+      suffix: "nach"
+      stem_variant: pass
+      features:
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: CTPV }
+
+    - slot: IMP
+      suffix: "ím"
+      features:
+        - { feature: mood, value: IMP }
+
+    - slot: PROH
+      suffix: "é"
+      features:
+        - { feature: mood, value: PROH }
+        - { feature: polarity, value: NEG }
+
+    - slot: HORT
+      suffix: "ká"
+      features:
+        - { feature: mood, value: HORT }
+
+    - slot: IRR
+      suffix: "čev"
+      features:
+        - { feature: mood, value: IRR }
+
+  neg_cells:
+    - slot: NEG.ANTIP.PF
+      suffix: "čik"
+      stem_variant: antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.TRS.PF
+      suffix: "nik"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: TRS }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.APPL.PF
+      suffix: "nik"
+      stem_variant: appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.CAUS.PF
+      suffix: "nik"
+      stem_variant: caus
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.CAUS.ANTIP.PF
+      suffix: "čik"
+      stem_variant: caus_antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.CAUS.APPL.PF
+      suffix: "nik"
+      stem_variant: caus_appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PF }
+
+    - slot: NEG.ANTIP.RET
+      suffix: "čac"
+      stem_variant: antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.TRS.RET
+      suffix: "nac"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: TRS }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.APPL.RET
+      suffix: "nac"
+      stem_variant: appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.CAUS.RET
+      suffix: "nac"
+      stem_variant: caus
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.CAUS.ANTIP.RET
+      suffix: "čac"
+      stem_variant: caus_antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.CAUS.APPL.RET
+      suffix: "nac"
+      stem_variant: caus_appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: RET }
+
+    - slot: NEG.CONT
+      suffix: "a"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.APPL.CONT
+      suffix: "a"
+      stem_variant: appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.CAUS.CONT
+      suffix: "a"
+      stem_variant: caus
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.CAUS.ANTIP.CONT
+      suffix: "a"
+      stem_variant: caus_antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.CAUS.APPL.CONT
+      suffix: "a"
+      stem_variant: caus_appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.PROG
+      suffix: "ime"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.APPL.PROG
+      suffix: "ime"
+      stem_variant: appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.CAUS.PROG
+      suffix: "ime"
+      stem_variant: caus
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.CAUS.ANTIP.PROG
+      suffix: "ime"
+      stem_variant: caus_antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.CAUS.APPL.PROG
+      suffix: "ime"
+      stem_variant: caus_appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.CTPV
+      suffix: "ach"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.APPL.CTPV
+      suffix: "ach"
+      stem_variant: appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.CAUS.CTPV
+      suffix: "ach"
+      stem_variant: caus
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.CAUS.ANTIP.CTPV
+      suffix: "ach"
+      stem_variant: caus_antip
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: ANTIP }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.CAUS.APPL.CTPV
+      suffix: "ach"
+      stem_variant: caus_appl
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: derivation, value: CAUS }
+        - { feature: voice, value: APPL }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.PASS.CONT
+      suffix: "na"
+      stem_variant: pass
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: CONT }
+
+    - slot: NEG.PASS.PROG
+      suffix: "nime"
+      stem_variant: pass
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: PROG }
+
+    - slot: NEG.PASS.CTPV
+      suffix: "nach"
+      stem_variant: pass
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: voice, value: PASS }
+        - { feature: aspect, value: CTPV }
+
+    - slot: NEG.HORT
+      suffix: "ku"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: mood, value: HORT }
+
+    - slot: NEG.IRR
+      suffix: "tir"
+      features:
+        - { feature: polarity, value: NEG }
+        - { feature: mood, value: IRR }
