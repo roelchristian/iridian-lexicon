@@ -1,0 +1,21 @@
+schema_version: '1.0'
+entry_kind: lexeme
+id: pet
+key: pet
+lemma: pět
+display_lemma: pět
+major_category: noun
+subtype: common
+glosses:
+  - dog
+notes: ''
+tags:
+  - class-4
+status: active
+stem_variants:
+  - label: base
+    form: pět
+  - label: reduced-soft
+    form: pěc
+manual_overrides: {}
+template_id: noun-class-4

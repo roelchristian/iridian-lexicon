@@ -1,0 +1,21 @@
+schema_version: '1.0'
+entry_kind: lexeme
+id: sobota
+key: sobota
+lemma: sobota
+display_lemma: sobota
+major_category: noun
+subtype: proper-noun
+glosses:
+  - Saturday
+notes: ''
+tags:
+  - class-2
+status: active
+stem_variants:
+  - label: base
+    form: sobota
+  - label: reduced
+    form: sobot
+manual_overrides: {}
+template_id: noun-class-2

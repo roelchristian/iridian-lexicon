@@ -1,0 +1,21 @@
+schema_version: '1.0'
+entry_kind: lexeme
+id: houla
+key: houla
+lemma: houla
+display_lemma: houla
+major_category: noun
+subtype: common
+glosses:
+  - knife
+notes: ''
+tags:
+  - class-1
+status: active
+stem_variants:
+  - label: base
+    form: houla
+  - label: reduced
+    form: houl
+manual_overrides: {}
+template_id: noun-class-1
