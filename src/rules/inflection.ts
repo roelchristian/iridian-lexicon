@@ -117,11 +117,13 @@ export function generateForms(
     const stemVariantLabel = cell.stem_variant ?? 'base';
     const stem = stemMap.get(stemVariantLabel) ?? baseStem;
 
-    // Concatenate stem + suffix.
-    // Strip leading/trailing hyphens from suffix — they are morphological
-    // notation in the YAML (e.g. "-a") but are not part of the phonological form.
+    // Build the surface form: prefix + stem + suffix.
+    // Strip leading/trailing hyphens from both prefix and suffix — they are
+    // morphological notation in the YAML (e.g. "-nime", "zá-") but are not
+    // part of the phonological form.
+    const prefix = (cell.prefix ?? '').replace(/^-+|-+$/g, '');
     const suffix = cell.suffix.replace(/^-+|-+$/g, '');
-    const generatedForm = stem + suffix;
+    const generatedForm = prefix + stem + suffix;
 
     // Check for a manual override on this slot
     const override = lexeme.manual_overrides[cell.slot];
