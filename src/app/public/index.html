@@ -2356,8 +2356,8 @@ const App = (() => {
     const featsStr = (c?.features ?? []).map(f => `${f.feature}:${f.value}`).join(', ');
     return `<div class="dyn-row cell"${opts.isNegDefault ? ' data-neg-default="true"' : ''}>
       <input placeholder="slot e.g. NOM.SG" value="${esc(c?.slot)}" title="Slot label">
-      <input placeholder="prefix" value="${esc(c?.prefix)}" title="Prefix (optional)" data-morpheme-ac="prefix">
-      <input placeholder="suffix e.g. -a" value="${esc(c?.suffix)}" title="Suffix" data-morpheme-ac="suffix">
+      <input placeholder="prefix" value="${esc(c?.prefix)}" title="Prefix (optional)">
+      <input placeholder="suffix e.g. -a" value="${esc(c?.suffix)}" title="Suffix">
       <input placeholder="base" value="${esc(c?.stem_variant)}" title="Stem variant (defaults to 'base')">
       <input placeholder="case:DIR, definiteness:DEF" value="${featsStr}" title="Feature bundle" list="cell-feat-suggestions">
       <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>
