@@ -24,6 +24,7 @@ import {
   getFormsForLexeme,
   getExamplesForLexeme,
   searchEntries,
+  searchEntrySuggestions,
   getEntriesByCategory,
   getEntriesByStatus,
 } from '../db.js';
@@ -56,6 +57,18 @@ export function entriesRouter(
       }
 
       res.json({ entries, count: entries.length });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });
+
+  // GET /api/entries/suggest
+  router.get('/suggest', (req: Request, res: Response) => {
+    try {
+      const q = String(req.query['q'] ?? '').trim();
+      const limit = Number(req.query['limit'] ?? 20);
+      const suggestions = q ? searchEntrySuggestions(db(), q, limit) : [];
+      res.json({ suggestions, count: suggestions.length });
     } catch (err) {
       res.status(500).json({ error: String(err) });
     }

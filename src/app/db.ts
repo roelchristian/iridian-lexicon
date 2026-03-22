@@ -9,6 +9,7 @@ export {
   getEntryByKey,
   getEntryById,
   searchEntries,
+  searchEntrySuggestions,
   getEntriesByCategory,
   getEntriesByStatus,
   getFormsForLexeme,
@@ -16,6 +17,10 @@ export {
   getAllRules,
   getRuleByKey,
   getRulesByKind,
+  getEntriesForRule,
   getExamplesForLexeme,
   getDbMeta,
+  getAllAvailableTags,
+  getTemplateSuggestions,
+  getInflectionProfileSuggestions,
 } from '../db/queries.js';

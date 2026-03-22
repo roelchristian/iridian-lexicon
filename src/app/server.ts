@@ -24,6 +24,8 @@ import { entriesRouter } from './routes/entries.js';
 import { rulesRouter } from './routes/rules.js';
 import { adminRouter } from './routes/admin.js';
 import { glossesRouter } from './routes/glosses.js';
+import { settingsRouter } from './routes/settings.js';
+import { suggestionsRouter } from './routes/suggestions.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -83,9 +85,11 @@ async function main() {
 
   // API routes
   app.use('/api/entries', entriesRouter(getDb, REPO_ROOT));
-  app.use('/api/rules', rulesRouter(getDb));
+  app.use('/api/rules', rulesRouter(getDb, REPO_ROOT));
   app.use('/api/admin', adminRouter(getDb, REPO_ROOT));
   app.use('/api/glosses', glossesRouter(REPO_ROOT));
+  app.use('/api/settings', settingsRouter(REPO_ROOT));
+  app.use('/api/suggestions', suggestionsRouter(getDb));
 
   // SPA fallback: serve index.html for /  and /manual
   const indexPath = path.join(PUBLIC_DIR, 'index.html');
