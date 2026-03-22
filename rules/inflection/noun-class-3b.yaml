@@ -1,59 +1,54 @@
 schema_version: '1.0'
 rule_kind: inflection
-id: noun-class-1
-key: noun-class-1
-friendly_name: Class I
-name: 'Noun Class I: type byl'
-description: >-
-  This noun class includes nouns that follow the declension pattern of the word "byl" (child). They
-  end with a consonant and do not display vowel alternations in their stem.
+id: noun-class-3b
+key: noun-class-3b
+friendly_name: Class III-B
+name: 'Noun Class III-B: type lobek'
+description: ''
 category: noun
 feature_axes: []
 cells:
   - slot: DIR
     suffix: ''
-    stem_variant: base
     features:
       - feature: case
         value: DIR
   - slot: TRS
-    suffix: '-a'
-    stem_variant: reduced
+    suffix: a
+    stem_variant: reduced-hard
     features:
       - feature: case
         value: TRS
   - slot: IND
-    suffix: '-am'
-    stem_variant: reduced
+    suffix: í
+    stem_variant: reduced-soft
     features:
       - feature: case
         value: IND
   - slot: DIR.DEF
-    suffix: '-ot'
-    stem_variant: reduced
+    suffix: ot
+    stem_variant: reduced-hard
     features:
       - feature: case
         value: DIR
       - feature: definiteness
         value: DEF
   - slot: TRS.DEF
-    suffix: '-at'
-    stem_variant: reduced
+    suffix: at
+    stem_variant: reduced-hard
     features:
       - feature: case
         value: TRS
       - feature: definiteness
         value: DEF
   - slot: IND.DEF
-    suffix: '-anč'
-    stem_variant: reduced
+    suffix: ít
+    stem_variant: reduced-soft
     features:
       - feature: case
         value: IND
       - feature: definiteness
         value: DEF
 inherits: []
-tags:
-  - nominal
-  - class-1
-notes: The noun "byl" (child) serves as the archetype for this class.
+tags: []
+notes: ''
