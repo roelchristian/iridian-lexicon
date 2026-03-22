@@ -7,3 +7,4 @@ dist/
 .DS_Store
 *.js.map
 generated/
+TEMP/
