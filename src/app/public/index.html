@@ -649,6 +649,7 @@
     }
     .dyn-row.sv   { grid-template-columns: 1fr 1fr 26px; }
     .dyn-row.mo   { grid-template-columns: 1fr 1fr 26px; }
+    .dyn-row.ar   { grid-template-columns: 2fr 1fr 1fr 26px; }
     .dyn-row.cell { grid-template-columns: 1.3fr 0.55fr 0.55fr 0.55fr 1.3fr 26px; }
     .dyn-row input {
       background: var(--surface2); border: 1px solid var(--border);
@@ -676,6 +677,58 @@
     .cell-col-heads span {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.06em; color: var(--text-muted); padding-left: 4px;
+    }
+
+    /* ── Morpheme autocomplete dropdown ─────────────────────────────── */
+    .morpheme-ac-drop {
+      position: absolute;
+      top: calc(100% + 3px);
+      left: 0;
+      min-width: 220px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      z-index: 9999;
+      font-size: 12px;
+    }
+    .morpheme-ac-drop .ac-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .morpheme-ac-drop .ac-item:last-child { border-bottom: none; }
+    .morpheme-ac-drop .ac-item:hover,
+    .morpheme-ac-drop .ac-item.focused { background: var(--surface2); }
+    .morpheme-ac-drop .ac-form {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .morpheme-ac-drop .ac-abbr {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent2);
+      flex-shrink: 0;
+    }
+    .morpheme-ac-drop .ac-gloss {
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .morpheme-ac-drop .ac-type {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+      flex-shrink: 0;
     }
 
     /* ── Rules panel ─────────────────────────────────────────────────── */
@@ -758,7 +811,10 @@
             <option value="postposition">Postpositions</option>
           </select>
         </div>
-        <button onclick="App.openEntryEditor()" style="background:var(--accent);border:none;color:#0f1117;padding:5px 0;border-radius:var(--radius);font-size:12px;font-family:var(--font-sans);font-weight:600;cursor:pointer;width:100%">+ New Entry</button>
+        <div style="display:flex;gap:6px">
+          <button onclick="App.openEntryEditor()" style="flex:1;background:var(--accent);border:none;color:#0f1117;padding:5px 0;border-radius:var(--radius);font-size:12px;font-family:var(--font-sans);font-weight:600;cursor:pointer">+ Lexeme</button>
+          <button onclick="App.openMorphemeEditor()" style="flex:1;background:var(--surface2);border:1px solid var(--accent2);color:var(--accent2);padding:5px 0;border-radius:var(--radius);font-size:12px;font-family:var(--font-sans);font-weight:600;cursor:pointer">+ Morpheme</button>
+        </div>
       </div>
       <div class="entry-list" id="entry-list">
         <div class="empty-state" style="height:200px">
@@ -853,6 +909,8 @@ const App = (() => {
   let paradigmDefaults = {};
   // Loaded once from /api/suggestions; used by entry-authoring autocomplete/chips.
   let entrySuggestions = { tags: [], templates: [], profiles: [] };
+  // Loaded once from /api/entries?kind=morpheme; used by cell prefix/suffix autocomplete.
+  let morphemeList = [];
 
   // ── Init ────────────────────────────────────────────────────────────
   async function init() {
@@ -860,6 +918,7 @@ const App = (() => {
       loadGlossary(),
       loadParadigmDefaults(),
       loadEntrySuggestions(),
+      loadMorphemes(),
       loadStatus(),
       loadEntries(),
       loadRuleList(),
@@ -894,6 +953,16 @@ const App = (() => {
       };
     } catch {
       entrySuggestions = { tags: [], templates: [], profiles: [] };
+    }
+  }
+
+  async function loadMorphemes() {
+    try {
+      const r = await fetch('/api/entries?kind=morpheme');
+      const { entries } = await r.json();
+      morphemeList = Array.isArray(entries) ? entries : [];
+    } catch {
+      morphemeList = [];
     }
   }
 
@@ -1132,7 +1201,7 @@ const App = (() => {
         <div class="hero-body">
           <div class="hero-top">
             <div class="hero-lemma">${e.display_lemma}</div>
-            <button class="hero-edit-btn" onclick="App.openEntryEditor('${e.key}')">✎ Edit</button>
+            <button class="hero-edit-btn" onclick="${e.entry_kind === 'morpheme' ? `App.openMorphemeEditor('${e.key}')` : `App.openEntryEditor('${e.key}')`}">✎ Edit</button>
           </div>
           <div class="hero-chips">
             <span class="key-chip">${e.key}</span>
@@ -1308,7 +1377,7 @@ const App = (() => {
   }
 
   // ── Drawer ────────────────────────────────────────────────────────────
-  let drawerMode = null; // 'new-entry' | 'edit-entry' | 'new-rule' | 'edit-rule'
+  let drawerMode = null; // 'new-entry' | 'edit-entry' | 'new-morpheme' | 'edit-morpheme' | 'new-rule' | 'edit-rule'
   let drawerKey  = null;
 
   function openDrawer() {
@@ -1325,6 +1394,7 @@ const App = (() => {
 
   async function saveDrawer() {
     if (drawerMode === 'new-entry' || drawerMode === 'edit-entry') await saveEntry();
+    else if (drawerMode === 'new-morpheme' || drawerMode === 'edit-morpheme') await saveMorpheme();
   }
 
   // ── Entry editor (drawer) ─────────────────────────────────────────────
@@ -1344,6 +1414,279 @@ const App = (() => {
     else if (entry?.inflection_profile) setInflectionToggle('profile');
     else setInflectionToggle('template');
     openDrawer();
+  }
+
+  // ── Morpheme editor (drawer) ──────────────────────────────────────────
+  function openMorphemeEditor(key) {
+    drawerMode = key ? 'edit-morpheme' : 'new-morpheme';
+    drawerKey  = key ?? null;
+    document.getElementById('drawer-title').textContent = key ? `Edit morpheme: ${key}` : 'New Morpheme';
+    document.getElementById('drawer-delete-btn').style.display = key ? '' : 'none';
+    document.getElementById('drawer-save-btn').textContent = 'Save';
+
+    // Use currentEntry if it matches; otherwise fall back to null (form renders empty)
+    const entry = key ? (currentEntry?.key === key ? currentEntry : null) : null;
+    document.getElementById('drawer-body').innerHTML = buildMorphemeForm(entry, !!key);
+    bindAllomorphButtons();
+    bindMorphemeTagControls();
+    openDrawer();
+  }
+
+  function buildMorphemeForm(e, isEdit) {
+    const selectedTags = e?.tags ?? [];
+    const visibleTagSuggestions = [
+      ...selectedTags,
+      ...entrySuggestions.tags.filter((t) => !selectedTags.includes(t)),
+    ].slice(0, 8);
+    const activeTags = new Set(selectedTags);
+    const tagOptions  = entrySuggestions.tags.map(t => `<option value="${esc(t)}"></option>`).join('');
+    const tagChips    = visibleTagSuggestions.length
+      ? visibleTagSuggestions.map(t => `<button type="button" class="suggestion-chip${activeTags.has(t)?' active':''}" data-tag-value="${esc(t)}">${esc(t)}</button>`).join('')
+      : '<div class="suggestion-empty">No saved tags yet.</div>';
+
+    // Gloss abbreviation suggestions — pulled from the loaded glossary
+    const glossAbbrOptions = Object.keys(glossary)
+      .sort()
+      .map(k => `<option value="${esc(k)}">${esc(k)} — ${esc(glossary[k]?.expansion ?? '')}</option>`)
+      .join('');
+
+    // Slot suggestions — derive feature names from all paradigm cells
+    const slotSet = new Set();
+    for (const cat of Object.values(paradigmDefaults)) {
+      for (const cell of [...(cat.cells ?? []), ...(cat.neg_cells ?? [])]) {
+        for (const f of (cell.features ?? [])) {
+          if (f.feature) slotSet.add(f.feature);
+        }
+      }
+    }
+    const slotOptions = [...slotSet].sort().map(s => `<option value="${esc(s)}"></option>`).join('');
+
+    // Paradigm category suggestions — derive feature values (the dimension labels)
+    const catSet = new Set(['case-system', 'TAM', 'voice', 'mood', 'definiteness', 'polarity', 'derivation']);
+    const catOptions = [...catSet].sort().map(c => `<option value="${esc(c)}"></option>`).join('');
+
+    // Gloss abbr placeholder — use actual Iridian abbreviations
+    const glossAbbrExample = Object.keys(glossary).length
+      ? Object.keys(glossary).slice(0, 3).join(', ')
+      : 'DIR, TRS.DEF, PF';
+
+    // Slot placeholder — use actual feature names from paradigm
+    const slotExample = slotSet.size
+      ? [...slotSet].slice(0, 3).join(', ')
+      : 'case, aspect, voice';
+
+    const allomorphRows = (e?.allomorph_rules ?? []).map(r =>
+      `<div class="dyn-row ar">
+        <input placeholder="conditioning context" value="${esc(r.context ?? '')}">
+        <input placeholder="allomorph form" value="${esc(r.form ?? '')}">
+        <input placeholder="condition tag" value="${esc(r.condition ?? '')}">
+        <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>
+       </div>`).join('');
+
+    return `
+      <datalist id="mtag-suggestions">${tagOptions}</datalist>
+      <datalist id="mgloss-abbr-suggestions">${glossAbbrOptions}</datalist>
+      <datalist id="mslot-suggestions">${slotOptions}</datalist>
+      <datalist id="mcat-suggestions">${catOptions}</datalist>
+
+      <div class="ed-section">Identity</div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Key</label>
+          <input type="text" id="mf-key" value="${esc(e?.key)}" ${isEdit?'readonly':''} placeholder="e.g. DIR, TRS.DEF">
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="mf-status">
+            ${['active','draft','deprecated'].map(s=>`<option${e?.status===s?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Lemma <span class="opt">(base form)</span></label>
+          <input type="text" id="mf-lemma" value="${esc(e?.lemma)}" placeholder="e.g. -ot, zá-">
+        </div>
+        <div class="field">
+          <label>Display lemma</label>
+          <input type="text" id="mf-display-lemma" value="${esc(e?.display_lemma)}" placeholder="e.g. -ot, zá-">
+        </div>
+      </div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Type</label>
+          <select id="mf-category">
+            ${['suffix','prefix','infix','circumfix','particle','clitic'].map(c=>`<option value="${c}"${(e?.major_category??'suffix')===c?' selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Subtype</label>
+          <input type="text" id="mf-subtype" value="${esc(e?.subtype)}" placeholder="e.g. case-suffix, voice-prefix">
+        </div>
+      </div>
+
+      <div class="ed-section">Gloss &amp; Slot</div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Display form</label>
+          <input type="text" id="mf-display-form" value="${esc(e?.display_form)}" placeholder="e.g. -ot, zá-">
+        </div>
+        <div class="field">
+          <label>Gloss abbreviation</label>
+          <input type="text" id="mf-gloss-abbr" list="mgloss-abbr-suggestions" value="${esc(e?.gloss_abbr)}" placeholder="e.g. ${esc(glossAbbrExample)}">
+        </div>
+      </div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Slot <span class="opt">(feature dimension)</span></label>
+          <input type="text" id="mf-slot" list="mslot-suggestions" value="${esc(e?.slot)}" placeholder="e.g. ${esc(slotExample)}">
+        </div>
+        <div class="field">
+          <label>Paradigm category</label>
+          <input type="text" id="mf-paradigm-cat" list="mcat-suggestions" value="${esc(e?.category)}" placeholder="e.g. case-system, TAM, voice">
+        </div>
+      </div>
+
+      <div class="ed-section">Content</div>
+      <div class="field">
+        <label>Glosses <span class="opt">(one per line)</span></label>
+        <textarea id="mf-glosses" rows="3">${(e?.glosses ?? []).join('\n')}</textarea>
+      </div>
+      <div class="field">
+        <label>Notes <span class="opt">(optional)</span></label>
+        <textarea id="mf-notes">${esc(e?.notes)}</textarea>
+      </div>
+      <div class="field">
+        <label>Tags <span class="opt">(comma-separated)</span></label>
+        <div class="field-group">
+          <input type="text" id="mf-tags" list="mtag-suggestions" value="${selectedTags.join(', ')}" placeholder="e.g. case, nominal">
+          <div class="suggestion-chips" id="morpheme-tag-chips">${tagChips}</div>
+        </div>
+      </div>
+
+      <div class="ed-section">Allomorph Rules
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-muted);margin-left:8px">conditioning environments</span>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 26px;gap:5px;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding-left:4px">Context</span>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding-left:4px">Form</span>
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding-left:4px">Condition tag</span>
+        <span></span>
+      </div>
+      <div class="dyn-list" id="ar-list">${allomorphRows}</div>
+      <button class="add-row-btn" id="add-ar">+ Add allomorph rule</button>
+    `;
+  }
+
+  function bindAllomorphButtons() {
+    document.getElementById('add-ar').onclick = () => {
+      const row = document.createElement('div');
+      row.className = 'dyn-row ar';
+      row.innerHTML = `
+        <input placeholder="context (e.g. stem ends in vowel)">
+        <input placeholder="form (e.g. -ra)">
+        <input placeholder="condition tag">
+        <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>`;
+      document.getElementById('ar-list').appendChild(row);
+    };
+  }
+
+  function bindMorphemeTagControls() {
+    const input = document.getElementById('mf-tags');
+    const syncChips = () => {
+      const active = new Set(getMorphemeTags());
+      document.querySelectorAll('#morpheme-tag-chips [data-tag-value]').forEach(c =>
+        c.classList.toggle('active', active.has(c.dataset.tagValue)));
+    };
+    input?.addEventListener('input', syncChips);
+    input?.addEventListener('change', () => {
+      syncMorphemeTagInput(getMorphemeTags());
+      syncChips();
+    });
+    document.querySelectorAll('#morpheme-tag-chips [data-tag-value]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const val = chip.dataset.tagValue;
+        const next = new Set(getMorphemeTags());
+        next.has(val) ? next.delete(val) : next.add(val);
+        syncMorphemeTagInput([...next].sort((a,b)=>a.localeCompare(b)));
+        syncChips();
+      });
+    });
+    syncChips();
+  }
+
+  function getMorphemeTags() {
+    const input = document.getElementById('mf-tags');
+    if (!input) return [];
+    return [...new Set(input.value.split(',').map(s=>s.trim()).filter(Boolean))];
+  }
+
+  function syncMorphemeTagInput(tags) {
+    const input = document.getElementById('mf-tags');
+    if (input) input.value = tags.join(', ');
+  }
+
+  function collectMorphemeForm() {
+    const glosses = document.getElementById('mf-glosses').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const arRows = [...document.querySelectorAll('#ar-list .dyn-row.ar')].map(row => {
+      const inputs = [...row.querySelectorAll('input')].map(i => i.value.trim());
+      const [context, form, condition] = inputs;
+      if (!context && !form) return null;
+      const rule = { context: context || '', form: form || '' };
+      if (condition) rule.condition = condition;
+      return rule;
+    }).filter(Boolean);
+
+    const key = document.getElementById('mf-key').value.trim();
+    return {
+      schema_version: '1.0',
+      entry_kind: 'morpheme',
+      id: key.replace(/[^a-zA-Z0-9_-]/g, '-'),
+      key,
+      lemma: document.getElementById('mf-lemma').value.trim(),
+      display_lemma: document.getElementById('mf-display-lemma').value.trim(),
+      major_category: document.getElementById('mf-category').value,
+      subtype: document.getElementById('mf-subtype').value.trim(),
+      glosses,
+      notes: document.getElementById('mf-notes').value.trim(),
+      tags: getMorphemeTags(),
+      status: document.getElementById('mf-status').value,
+      display_form: document.getElementById('mf-display-form').value.trim(),
+      gloss_abbr: document.getElementById('mf-gloss-abbr').value.trim(),
+      slot: document.getElementById('mf-slot').value.trim(),
+      category: document.getElementById('mf-paradigm-cat').value.trim(),
+      allomorph_rules: arRows,
+    };
+  }
+
+  async function saveMorpheme() {
+    const btn = document.getElementById('drawer-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      const isEdit = drawerMode === 'edit-morpheme';
+      const payload = collectMorphemeForm();
+      if (!payload.key) { alert('Key is required'); return; }
+      const url = isEdit ? `/api/entries/${drawerKey}` : '/api/entries';
+      const method = isEdit ? 'PUT' : 'POST';
+      const r = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await r.json();
+      if (!r.ok) { alert('Error: ' + (data.error ?? JSON.stringify(data))); return; }
+      toast(`✓ ${isEdit ? 'Updated' : 'Created'}: ${payload.key}`, 'success');
+      closeDrawer();
+      await Promise.all([loadEntries(), loadMorphemes()]);
+      await loadStatus();
+      if (data.key) selectEntry(data.key);
+    } catch(err) {
+      toast('✗ ' + String(err), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save';
+    }
   }
 
   function buildEntryForm(e, isEdit) {
@@ -1666,7 +2009,7 @@ const App = (() => {
       toast(`✓ ${isEdit ? 'Updated' : 'Created'}: ${payload.key}`, 'success');
       closeDrawer();
       await loadEntrySuggestions();
-      await loadEntries();
+      await Promise.all([loadEntries(), loadMorphemes()]);
       await loadStatus();
       if (data.key) selectEntry(data.key);
     } catch(err) {
@@ -1689,7 +2032,7 @@ const App = (() => {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-welcome').classList.add('active');
       await loadEntrySuggestions();
-      await loadEntries();
+      await Promise.all([loadEntries(), loadMorphemes()]);
       await loadStatus();
     } catch(err) { toast('✗ ' + String(err), 'error'); }
   }
@@ -1891,9 +2234,10 @@ const App = (() => {
       </div>
 
       <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px">
-        Features: <code style="font-family:var(--font-mono)">case:NOM, number:SG</code> &nbsp;·&nbsp;
+        Features: <code style="font-family:var(--font-mono)">case:DIR, definiteness:DEF</code> &nbsp;·&nbsp;
         Prefix/suffix: hyphens stripped automatically (e.g. <code style="font-family:var(--font-mono)">-a</code> → <code style="font-family:var(--font-mono)">a</code>)
       </p>
+      ${buildFeatureDatalist()}
       <div class="cell-col-heads">
         <span>Slot</span><span>Prefix</span><span>Suffix</span><span>Stem var</span><span>Features</span><span></span>
       </div>
@@ -1912,16 +2256,37 @@ const App = (() => {
     `;
 
     applyNegativeLineVisibility();
+    // Wire morpheme autocomplete after the cells-list is in the DOM
+    initCellAutocomplete();
+  }
+
+  // Build a <datalist> of feature bundle suggestions from paradigm-defaults cells
+  function buildFeatureDatalist() {
+    const seen = new Set();
+    const options = [];
+    for (const cat of Object.values(paradigmDefaults)) {
+      for (const cell of [...(cat.cells ?? []), ...(cat.neg_cells ?? [])]) {
+        const feats = (cell.features ?? []);
+        if (!feats.length) continue;
+        const str = feats.map(f => `${f.feature}:${f.value}`).join(', ');
+        if (!seen.has(str)) {
+          seen.add(str);
+          options.push(`<option value="${esc(str)}"></option>`);
+        }
+      }
+    }
+    if (!options.length) return '';
+    return `<datalist id="cell-feat-suggestions">${options.join('')}</datalist>`;
   }
 
   function buildCellRow(c, opts = {}) {
     const featsStr = (c?.features ?? []).map(f => `${f.feature}:${f.value}`).join(', ');
     return `<div class="dyn-row cell"${opts.isNegDefault ? ' data-neg-default="true"' : ''}>
       <input placeholder="slot e.g. NOM.SG" value="${esc(c?.slot)}" title="Slot label">
-      <input placeholder="prefix" value="${esc(c?.prefix)}" title="Prefix (optional)">
-      <input placeholder="suffix e.g. -a" value="${esc(c?.suffix)}" title="Suffix">
+      <input placeholder="prefix" value="${esc(c?.prefix)}" title="Prefix (optional)" data-morpheme-ac="prefix">
+      <input placeholder="suffix e.g. -a" value="${esc(c?.suffix)}" title="Suffix" data-morpheme-ac="suffix">
       <input placeholder="base" value="${esc(c?.stem_variant)}" title="Stem variant (defaults to 'base')">
-      <input placeholder="case:NOM, number:SG" value="${featsStr}" title="Feature bundle">
+      <input placeholder="case:DIR, definiteness:DEF" value="${featsStr}" title="Feature bundle" list="cell-feat-suggestions">
       <button class="del-btn" onclick="this.closest('.dyn-row').remove()">×</button>
     </div>`;
   }
@@ -1991,6 +2356,155 @@ const App = (() => {
     const row = document.createElement('div');
     row.innerHTML = buildCellRow(cell, opts);
     return row.firstElementChild;
+  }
+
+  // ── Morpheme autocomplete ─────────────────────────────────────────────
+  // A single shared floating dropdown anchored to whichever prefix/suffix
+  // input is currently focused inside #cells-list.
+
+  let _acDrop = null;         // the dropdown DOM element
+  let _acActiveInput = null;  // input currently being autocompleted
+  let _acFocusIdx = -1;       // keyboard-nav index
+
+  function getAcDrop() {
+    if (!_acDrop) {
+      _acDrop = document.createElement('div');
+      _acDrop.className = 'morpheme-ac-drop';
+      _acDrop.style.display = 'none';
+      document.body.appendChild(_acDrop);
+
+      // Mouse clicks on items
+      _acDrop.addEventListener('mousedown', (e) => {
+        const item = e.target.closest('.ac-item');
+        if (!item) return;
+        e.preventDefault();
+        acCommit(item.dataset.form);
+      });
+    }
+    return _acDrop;
+  }
+
+  function acOpen(input) {
+    _acActiveInput = input;
+    acUpdate();
+  }
+
+  function acClose() {
+    const drop = getAcDrop();
+    drop.style.display = 'none';
+    _acActiveInput = null;
+    _acFocusIdx = -1;
+  }
+
+  function acUpdate() {
+    if (!_acActiveInput) return;
+    const drop = getAcDrop();
+    const raw = _acActiveInput.value;
+    // Strip leading/trailing hyphens for matching, but keep the raw value for display
+    const q = raw.replace(/^-+|-+$/g, '').toLowerCase();
+    const kind = _acActiveInput.dataset.morphemeAc; // 'prefix' or 'suffix'
+
+    // Match morphemes: by lemma, display_form, gloss_abbr, or glosses
+    const matches = morphemeList.filter(m => {
+      // Prefer type-appropriate morphemes first but show all
+      const lemmaClean = (m.lemma ?? '').replace(/^-+|-+$/g, '').toLowerCase();
+      const form = (m.display_form ?? m.lemma ?? '').replace(/^-+|-+$/g, '').toLowerCase();
+      const abbr = (m.gloss_abbr ?? '').toLowerCase();
+      const glossText = (m.glosses ?? []).join(' ').toLowerCase();
+      if (!q) {
+        // No query: show morphemes matching the column type
+        return m.major_category === kind;
+      }
+      return lemmaClean.includes(q) || form.includes(q) || abbr.includes(q) || glossText.includes(q);
+    });
+
+    // If no type-specific matches on empty query, fall back to all morphemes
+    const typeMatches = !q ? matches : null;
+    const finalMatches = (typeMatches && typeMatches.length === 0)
+      ? morphemeList.slice(0, 12)
+      : matches.slice(0, 12);
+
+    if (!finalMatches.length) { acClose(); return; }
+
+    // Sort: type-matching first
+    finalMatches.sort((a, b) => {
+      const aMatch = a.major_category === kind ? 0 : 1;
+      const bMatch = b.major_category === kind ? 0 : 1;
+      return aMatch - bMatch;
+    });
+
+    drop.innerHTML = finalMatches.map((m, i) => {
+      // The value to insert: use display_form, strip outer hyphens
+      const insertForm = (m.display_form ?? m.lemma ?? '').replace(/^-+|-+$/g, '');
+      const displayForm = m.display_form ?? m.lemma ?? '';
+      const abbr = m.gloss_abbr ?? m.key ?? '';
+      const gloss = (m.glosses ?? []).slice(0, 2).join(', ');
+      const typeLabel = m.major_category ?? '';
+      return `<div class="ac-item${i === _acFocusIdx ? ' focused' : ''}" data-form="${esc(insertForm)}">
+        <span class="ac-form">${esc(displayForm)}</span>
+        <span class="ac-abbr">${esc(abbr)}</span>
+        <span class="ac-gloss">${esc(gloss)}</span>
+        <span class="ac-type">${esc(typeLabel)}</span>
+      </div>`;
+    }).join('');
+
+    // Position below the input
+    const rect = _acActiveInput.getBoundingClientRect();
+    drop.style.left  = `${rect.left + window.scrollX}px`;
+    drop.style.top   = `${rect.bottom + window.scrollY + 2}px`;
+    drop.style.width = `${Math.max(rect.width, 240)}px`;
+    drop.style.display = 'block';
+  }
+
+  function acCommit(form) {
+    if (!_acActiveInput) return;
+    _acActiveInput.value = form;
+    _acActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+    acClose();
+    _acActiveInput.focus();
+  }
+
+  function acMoveFocus(delta) {
+    const drop = getAcDrop();
+    const items = [...drop.querySelectorAll('.ac-item')];
+    if (!items.length) return;
+    _acFocusIdx = Math.max(0, Math.min(items.length - 1, _acFocusIdx + delta));
+    items.forEach((el, i) => el.classList.toggle('focused', i === _acFocusIdx));
+    items[_acFocusIdx]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  // Wire autocomplete via event delegation on cells-list (set up once after DOM ready)
+  function initCellAutocomplete() {
+    const list = document.getElementById('cells-list');
+    if (!list || list._acWired) return;
+    list._acWired = true;
+
+    list.addEventListener('input', (e) => {
+      if (e.target.dataset.morphemeAc) acOpen(e.target);
+    });
+
+    list.addEventListener('focus', (e) => {
+      if (e.target.dataset.morphemeAc) { _acFocusIdx = -1; acOpen(e.target); }
+    }, true);
+
+    list.addEventListener('blur', (e) => {
+      if (e.target.dataset.morphemeAc) setTimeout(acClose, 150);
+    }, true);
+
+    list.addEventListener('keydown', (e) => {
+      if (!e.target.dataset.morphemeAc) return;
+      const drop = getAcDrop();
+      if (drop.style.display === 'none') return;
+      if (e.key === 'ArrowDown')  { e.preventDefault(); acMoveFocus(+1); }
+      else if (e.key === 'ArrowUp')   { e.preventDefault(); acMoveFocus(-1); }
+      else if (e.key === 'Enter') {
+        const items = [...drop.querySelectorAll('.ac-item')];
+        if (_acFocusIdx >= 0 && items[_acFocusIdx]) {
+          e.preventDefault();
+          acCommit(items[_acFocusIdx].dataset.form);
+        }
+      } else if (e.key === 'Escape') { acClose(); }
+    });
   }
 
   function getNegPrefixInput(row) {
@@ -2180,7 +2694,7 @@ const App = (() => {
 
       toast(`✓ Rule ${isEdit ? 'updated' : 'created'}: ${payload.key}`, 'success');
       currentRuleKey = payload.key;
-      await loadStatus();
+      await Promise.all([loadStatus(), loadEntrySuggestions()]);
       await loadRuleList();
       await loadSelectedRule(payload.key);
     } catch(err) { toast('✗ ' + String(err), 'error'); }
@@ -2234,7 +2748,7 @@ const App = (() => {
   return {
     init, selectEntry, search, applyFilters, rebuild, exportArtifacts,
     // Editor
-    openEntryEditor, closeDrawer, saveDrawer, deleteCurrentEntry,
+    openEntryEditor, openMorphemeEditor, closeDrawer, saveDrawer, deleteCurrentEntry,
     setInflectionToggle,
     // Rules
     switchSidebarTab, openRuleEditor, selectRule, filterRuleList,
