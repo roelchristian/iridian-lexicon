@@ -1,0 +1,54 @@
+schema_version: '1.0'
+rule_kind: inflection
+id: noun-class-5
+key: noun-class-5
+friendly_name: Class V
+name: 'Noun Class V: type Antun'
+description: ''
+category: noun
+feature_axes:
+  - ['DIR', 'TRS', 'IND'] # direct (absolutive), transitive (ergative), indirect (oblique)
+cells:
+  - slot: DIR
+    suffix: ''
+    features:
+      - feature: case
+        value: DIR
+  - slot: TRS
+    suffix: ''
+    stem_variant: a
+    features:
+      - feature: case
+        value: TRS
+  - slot: IND
+    suffix: ''
+    stem_variant: ě
+    features:
+      - feature: case
+        value: IND
+  - slot: DIR.DEF
+    suffix: ''
+    stem_variant: ot
+    features:
+      - feature: case
+        value: DIR
+      - feature: definiteness
+        value: DEF
+  - slot: TRS.DEF
+    suffix: ''
+    stem_variant: at
+    features:
+      - feature: case
+        value: TRS
+      - feature: definiteness
+        value: DEF
+  - slot: IND.DEF
+    suffix: ''
+    stem_variant: ě
+    features:
+      - feature: case
+        value: IND
+      - feature: definiteness
+        value: DEF
+tags: []
+notes: ''

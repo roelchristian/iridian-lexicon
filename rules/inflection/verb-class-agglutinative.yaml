@@ -1,0 +1,193 @@
+schema_version: "1.0"
+rule_kind: inflection
+id: verb-class-agglutinative
+key: verb-class-agglutinative
+name: Agglutinative Verb Class (PV/ANTIP alignment)
+category: verb
+description: >
+  Agglutinative verb paradigm for root-alignment languages.
+  Demonstrates: multiple stem variants for phonological alternations
+  (e.g. k→č in antipassive), prefix slots (NEG zá-, directional PV-),
+  required aspect+alignment co-occurrence, and deverbal nominalization.
+
+  Slot naming convention: [NEG.]DIR.ASP[.NMLZ][.PERSON.NUMBER]
+  where DIR = PV (patientive-voice) | ANTIP (antipassive)
+       ASP = PERF (perfective) | PROG (progressive/imperfective)
+       NMLZ = deverbal nominalization suffix
+
+  stem_variants expected on lexemes using this rule:
+    base  — default root form  (e.g. piašt-)
+    antip — antipassive allomorph, typically k→č  (e.g. piašč-)
+
+feature_axes:
+  - [PV, ANTIP]          # voice / alignment
+  - [PERF, PROG]         # aspect
+  - [BMS, NMLZ]            # nominalization (- = finite form)
+  - [1SG, 2SG, 3SG, 1PL, 2PL, 3PL, 2A]   # person+number (- = non-finite)
+
+cells:
+  # -----------------------------------------------------------------------
+  # PV (patientive voice) — uses base stem, no special allomorph
+  # -----------------------------------------------------------------------
+
+  - slot: PV.PERF
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nik"
+    notes: "piaštnik — PV perfective bare (non-finite / citation)"
+
+  - slot: PV.PERF.NMLZ
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: nominalization, value: NMLZ }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikou"
+    notes: "piaštnikou — deverbal noun from PV.PERF; lexeme major_category stays 'verb'"
+
+  - slot: PV.PROG
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PROG }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nime"
+
+  # Person-inflected PV perfective forms (indicative mood — requires aspect+alignment)
+  - slot: PV.PERF.1SG
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "1" }
+      - { feature: number, value: SG }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikam"
+
+  - slot: PV.PERF.2SG
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "2" }
+      - { feature: number, value: SG }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikan"
+
+  - slot: PV.PERF.3SG
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "3" }
+      - { feature: number, value: SG }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikas"
+
+  - slot: PV.PERF.1PL
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "1" }
+      - { feature: number, value: PL }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikami"
+
+  - slot: PV.PERF.2PL
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "2" }
+      - { feature: number, value: PL }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikanou"
+
+  - slot: PV.PERF.3PL
+    features:
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+      - { feature: person, value: "3" }
+      - { feature: number, value: PL }
+    stem_variant: base
+    prefix: ""
+    suffix: "-nikasou"
+
+  # -----------------------------------------------------------------------
+  # ANTIP (antipassive) — uses the antip stem variant (k→č alternation)
+  # -----------------------------------------------------------------------
+
+  - slot: ANTIP.PERF
+    features:
+      - { feature: voice, value: ANTIP }
+      - { feature: aspect, value: PERF }
+    stem_variant: antip
+    prefix: ""
+    suffix: "-ik"
+    notes: "piaščik — antipassive stem (k→č) + perfective suffix"
+
+  - slot: ANTIP.PROG
+    features:
+      - { feature: voice, value: ANTIP }
+      - { feature: aspect, value: PROG }
+    stem_variant: antip
+    prefix: ""
+    suffix: "-ime"
+
+  # -----------------------------------------------------------------------
+  # Negated forms — NEG prefix zá- stacks before the directional prefix.
+  # The PV directional prefix is implicit in the base form (no separate
+  # prefix morpheme needed); negation is marked by the prefix only.
+  # -----------------------------------------------------------------------
+
+  - slot: NEG.PV.PROG
+    features:
+      - { feature: polarity, value: NEG }
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PROG }
+    stem_variant: base
+    prefix: "zá"
+    suffix: "-nime"
+    notes: "zápiaštnime — NEG prefix + base stem + PROG suffix"
+
+  - slot: NEG.PV.PERF
+    features:
+      - { feature: polarity, value: NEG }
+      - { feature: voice, value: PV }
+      - { feature: aspect, value: PERF }
+    stem_variant: base
+    prefix: "zá"
+    suffix: "-nik"
+
+  - slot: NEG.ANTIP.PERF
+    features:
+      - { feature: polarity, value: NEG }
+      - { feature: voice, value: ANTIP }
+      - { feature: aspect, value: PERF }
+    stem_variant: antip
+    prefix: "zá"
+    suffix: "-ik"
+
+  - slot: NEG.ANTIP.PROG
+    features:
+      - { feature: polarity, value: NEG }
+      - { feature: voice, value: ANTIP }
+      - { feature: aspect, value: PROG }
+    stem_variant: antip
+    prefix: "zá"
+    suffix: "-ime"
+
+inherits: []
+tags: [verb, agglutinative, alignment, prefix-morphology]
+notes: >
+  Phonological alternation k→č applies in the antipassive stem variant.
+  This is handled by declaring two stem_variants on the lexeme (base and antip)
+  rather than embedding a rule here — so the allomorph is controlled per-lexeme,
+  giving you the flexibility to have lexemes where the alternation does not apply.
+  Morphotactic co-occurrence constraint (INDICATIVE requires ASP.ALIGN) is
+  enforced in the companion rules/morphotactics/verbal-slots.yaml file.

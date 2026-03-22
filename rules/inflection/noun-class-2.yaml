@@ -1,0 +1,49 @@
+schema_version: "1.0"
+id: "noun-class-2-001"
+key: "noun-class-2"
+friendly_name: "Class II"
+name: "Noun Class II: type trava"
+description: >
+  This noun class includes nouns that follow the declension pattern of the word "trava" (bread). They end with a vowel (a or o).
+category: noun
+feature_axes:
+  - ["DIR", "TRS", "IND"] # direct (absolutive), transitive (ergative), indirect (oblique)
+cells:
+  - slot: "DIR"
+    features:
+      - { feature: case, value: DIR }
+    stem_variant: base
+    suffix: ""
+  - slot: "TRS"
+    features:
+      - { feature: case, value: TRS }
+    suffix: "-y"
+    stem_variant: reduced
+  - slot: "IND"
+    features:
+      - { feature: case, value: IND }
+    suffix: "-ě"
+    stem_variant: reduced
+  - slot: "DIR.DEF"
+    features:
+      - { feature: case, value: DIR }
+      - { feature: definiteness, value: DEF }
+    suffix: "-at"
+    stem_variant: reduced
+  - slot: "TRS.DEF"
+    features:
+      - { feature: case, value: TRS }
+      - { feature: definiteness, value: DEF }
+    suffix: "-yt"
+    stem_variant: reduced
+  - slot: "IND.DEF"
+    features:
+      - { feature: case, value: IND }
+      - { feature: definiteness, value: DEF }
+    suffix: "-ět"
+    stem_variant: reduced
+tags:
+  - nominal
+  - class-2
+notes: >
+  The noun "trava" (bread) serves as the archetype for this class. 

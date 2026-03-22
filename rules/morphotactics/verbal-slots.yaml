@@ -1,0 +1,78 @@
+schema_version: "1.0"
+rule_kind: morphotactic
+id: verbal-slots
+key: verbal-slots
+name: Verbal Slot Template (agglutinative alignment verbs)
+description: >
+  Defines the linear slot order and co-occurrence constraints for
+  agglutinative verbs in Iridian.  Slots are ordered by position index:
+  lower position = closer to left edge (prefixes first, suffixes last).
+
+  The INDICATIVE mood slot (when filled) requires both the ASP and ALIGN
+  slots to be filled simultaneously — bare indicative is ungrammatical
+  without aspect and alignment morphology.
+
+word_class: verb
+
+slots:
+  - name: NEG
+    position: 1
+    required: false
+    allowed_morpheme_keys: [neg-za]
+    notes: Negation prefix zá-; optional
+
+  - name: ALIGN
+    position: 2
+    required: false
+    allowed_morpheme_keys: [pv, antip]
+    notes: >
+      Voice/alignment slot: PV (patientive) or ANTIP (antipassive).
+      When INDICATIVE is filled, this slot becomes required.
+    requires_co_occurrence: []   # see INDICATIVE slot for the reciprocal constraint
+
+  - name: ROOT
+    position: 3
+    required: true
+    notes: The verb root; always required
+
+  - name: ASP
+    position: 4
+    required: false
+    allowed_morpheme_keys: [perf, prog]
+    notes: >
+      Aspect: PERF (perfective -nik/-ik) or PROG (progressive -nime/-ime).
+      When INDICATIVE is filled, this slot becomes required.
+
+  - name: INDICATIVE
+    position: 5
+    required: false
+    requires_co_occurrence: [ASP, ALIGN]
+    notes: >
+      Finite indicative agreement suffix.  When present, both ASP and ALIGN
+      must also be filled — bare INDICATIVE without aspect and alignment
+      marking is ungrammatical.
+
+  - name: NMLZ
+    position: 6
+    required: false
+    allowed_morpheme_keys: [nmlz-ou]
+    excludes: [INDICATIVE]
+    notes: >
+      Deverbal nominalization suffix -ou; incompatible with finite agreement
+      (a nominalized verb does not take personal endings).
+
+alternations:
+  - name: k→č antipassive
+    context: "stem-final /k/ or /kt/ cluster when ALIGN=ANTIP"
+    result: "stem-final consonant changes: k→č (e.g. piašt→piašč)"
+
+  - name: accent on NEG prefix
+    context: "NEG slot filled"
+    result: "prefix zá- bears primary stress, displacing root accent"
+
+tags: [verb, agglutinative, alignment, morphotactics]
+notes: >
+  Co-occurrence rule for INDICATIVE: the morphotactic checker enforces that
+  whenever the INDICATIVE slot is filled, both ASP and ALIGN must also be
+  filled.  This captures the fact that bare indicative agreement without
+  explicit aspect and voice marking is ungrammatical in Iridian.
